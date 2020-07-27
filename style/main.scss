@@ -413,91 +413,51 @@ hr {
   -moz-transition-property: -moz-transform;
   transition-property: transform;
 
-  // Colors for all 11 states, false = no special color
-  $special-colors: false false, // 2
-                   false false, // 4
-                   #f78e48 true, // 8
-                   #fc5e2e true, // 16
-                   #ff3333 true, // 32
-                   #ff0000 true, // 64
-                   false true, // 128
-                   false true, // 256
-                   false true, // 512
-                   false true, // 1024
-                   false true; // 2048
-  $limit: 11;
-
-  // Build tile colors
-  @for $exponent from 1 through $limit {
-    $power: pow(2, $exponent);
-
-    &.tile-#{$power} .tile-inner {
-      // Calculate base background color
-      $gold-percent: ($exponent - 1) / ($limit - 1) * 100;
-      $mixed-background: mix($tile-gold-color, $tile-color, $gold-percent);
-
-      $nth-color: nth($special-colors, $exponent);
-
-      $special-background: nth($nth-color, 1);
-      $bright-color: nth($nth-color, 2);
-
-      @if $special-background {
-        $mixed-background: mix($special-background, $mixed-background, 55%);
-      }
-
-      @if $bright-color {
-        color: $bright-text-color;
-      }
-
-      // Set background
-      background: $mixed-background;
-
-      // Add glow
-      $glow-opacity: max($exponent - 4, 0) / ($limit - 4);
-
-      @if not $special-background {
-        box-shadow: 0 0 30px 10px rgba($tile-gold-glow-color, $glow-opacity / 1.8),
-                    inset 0 0 0 1px rgba(white, $glow-opacity / 3);
-      }
-    }
-  }
-
-  // Super tiles (above 2048)
-  &.tile-super .tile-inner {
-    color: $bright-text-color;
-    background: mix(#333, $tile-gold-color, 95%);
-  }
-
-  &.tile-3-digits .tile-inner {
-    font-size: 45px;
-    @include smaller($mobile-threshold) {
-      font-size: 25px;
-    }
-  }
-
-  &.tile-4-digits .tile-inner {
-    font-size: 35px;
-    @include smaller($mobile-threshold) {
-      font-size: 15px;
-    }
-  }
-
-  &.tile-5-digits .tile-inner {
-    font-size: 30px;
-    @include smaller($mobile-threshold) {
-      font-size: 10px;
-    }
+  &.tile-highlighted {
+    z-index: 20;
   }
   &.tile-highlighted .tile-inner {
-    color: white;
     background: sienna;
-    font-weight: bold;
+  }
+  &.tile-bounce-0 .tile-inner {
+    animation: bounce-up 0.25s infinite alternate;
+  }
+  &.tile-bounce-1 .tile-inner {
+    animation: bounce-right 0.25s infinite alternate;
+  }
+  &.tile-bounce-2 .tile-inner {
+    animation: bounce-down 0.25s infinite alternate;
+  }
+  &.tile-bounce-3 .tile-inner {
+    animation: bounce-left 0.25s infinite alternate;
+  }
+  @keyframes bounce-up {
+    from { transform: translateY(0px); z-index: 20; }
+    to { transform: translateY(-15px); z-index: 20; }
+  }
+  @keyframes bounce-down {
+    from { transform: translateY(0px); z-index: 20; }
+    to { transform: translateY(15px); z-index: 20; }
+  }
+  @keyframes bounce-left {
+    from { transform: translateX(0px); z-index: 20; }
+    to { transform: translateX(-15px); z-index: 20; }
+  }
+  @keyframes bounce-right {
+    from { transform: translateX(0px); z-index: 20; }
+    to { transform: translateX(15px); z-index: 20; }
+  }
+  &.enemy-ghost .tile-inner {
+    background-image: url(enemy-ghost.png);
+    background-size: contain;
   }
   &.blue-ghost .tile-inner {
-    background-image: radial-gradient(circle at center, blue 0%, blue 20%, white 50%);
+    background-image: radial-gradient(circle at center, blue 0%, blue 10%, transparent 20%), url(friendly-ghost.png);
+    background-size: contain;
   }
   &.red-ghost .tile-inner {
-    background-image: radial-gradient(circle at center, red 0%, red 20%, white 50%);
+    background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
+    background-size: contain;
   }
 }
 
@@ -530,12 +490,6 @@ hr {
   100% {
     @include transform(scale(1));
   }
-}
-
-.tile-merged .tile-inner {
-  z-index: 20;
-  @include animation(pop 200ms ease $transition-speed);
-  @include animation-fill-mode(backwards);
 }
 
 .above-game {

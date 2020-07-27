@@ -50,7 +50,10 @@ HTMLActuator.prototype.addTile = function (tile) {
   var appearanceClasses = this.appearanceClasses(tile);
 
   if (tile.isHighlighted) {
-    appearanceClasses = appearanceClasses.concat(["tile-highlighted"]);
+    appearanceClasses.push("tile-highlighted");
+    if (tile.selectedDirection !== null) {
+        appearanceClasses.push("tile-bounce-" + tile.selectedDirection);
+    }
   }
 
   // We can't use classlist because it somehow glitches when replacing classes
@@ -60,10 +63,10 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   inner.classList.add("tile-inner");
   inner.innerHTML =
-      (tile.owner === 'ai') ? '?' :
+      (tile.owner === 'ai') ? '' :
       (tile.owner === null) ? ('') :
-      (tile.color === 'blue') ? ('B') :
-      (tile.color === 'red') ? ('R') :
+      (tile.color === 'blue') ? ('') :
+      (tile.color === 'red') ? ('') :
       'X';
 
   if (tile.previousPosition) {
@@ -100,7 +103,7 @@ HTMLActuator.prototype.valueClass = function (tile) {
     if (tile.owner === null) {
         return "empty-cell";
     } else if (tile.owner == 'ai') {
-        return "opposing-ghost";
+        return "enemy-ghost";
     } else if (tile.color == 'red') {
         return "red-ghost";
     } else {

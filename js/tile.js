@@ -9,6 +9,14 @@ function Tile(position, color, owner) {
   this.selectedDirection = null;
 }
 
+Tile.prototype.isExit = function () {
+    return (this.x == 0 && this.y == 0) || (this.x == 5 && this.y == 0);
+};
+
+Tile.prototype.isExitForOpponent = function () {
+    return (this.x == 0 && this.y == 5) || (this.x == 5 && this.y == 5);
+};
+
 Tile.prototype.updatePosition = function (position) {
   this.x = position.x;
   this.y = position.y;
