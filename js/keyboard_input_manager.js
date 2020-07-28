@@ -76,47 +76,47 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
-  this.bindButtonPress(".tile-position-1-1", function (event) { this.emit("click", {x: 0, y: 0}); });
-  this.bindButtonPress(".tile-position-1-2", function (event) { this.emit("click", {x: 0, y: 1}); });
-  this.bindButtonPress(".tile-position-1-3", function (event) { this.emit("click", {x: 0, y: 2}); });
-  this.bindButtonPress(".tile-position-1-4", function (event) { this.emit("click", {x: 0, y: 3}); });
-  this.bindButtonPress(".tile-position-1-5", function (event) { this.emit("click", {x: 0, y: 4}); });
-  this.bindButtonPress(".tile-position-1-6", function (event) { this.emit("click", {x: 0, y: 5}); });
-  this.bindButtonPress(".tile-position-2-1", function (event) { this.emit("click", {x: 1, y: 0}); });
-  this.bindButtonPress(".tile-position-2-2", function (event) { this.emit("click", {x: 1, y: 1}); });
-  this.bindButtonPress(".tile-position-2-3", function (event) { this.emit("click", {x: 1, y: 2}); });
-  this.bindButtonPress(".tile-position-2-4", function (event) { this.emit("click", {x: 1, y: 3}); });
-  this.bindButtonPress(".tile-position-2-5", function (event) { this.emit("click", {x: 1, y: 4}); });
-  this.bindButtonPress(".tile-position-2-6", function (event) { this.emit("click", {x: 1, y: 5}); });
-  this.bindButtonPress(".tile-position-3-1", function (event) { this.emit("click", {x: 2, y: 0}); });
-  this.bindButtonPress(".tile-position-3-2", function (event) { this.emit("click", {x: 2, y: 1}); });
-  this.bindButtonPress(".tile-position-3-3", function (event) { this.emit("click", {x: 2, y: 2}); });
-  this.bindButtonPress(".tile-position-3-4", function (event) { this.emit("click", {x: 2, y: 3}); });
-  this.bindButtonPress(".tile-position-3-5", function (event) { this.emit("click", {x: 2, y: 4}); });
-  this.bindButtonPress(".tile-position-3-6", function (event) { this.emit("click", {x: 2, y: 5}); });
-  this.bindButtonPress(".tile-position-4-1", function (event) { this.emit("click", {x: 3, y: 0}); });
-  this.bindButtonPress(".tile-position-4-2", function (event) { this.emit("click", {x: 3, y: 1}); });
-  this.bindButtonPress(".tile-position-4-3", function (event) { this.emit("click", {x: 3, y: 2}); });
-  this.bindButtonPress(".tile-position-4-4", function (event) { this.emit("click", {x: 3, y: 3}); });
-  this.bindButtonPress(".tile-position-4-5", function (event) { this.emit("click", {x: 3, y: 4}); });
-  this.bindButtonPress(".tile-position-4-6", function (event) { this.emit("click", {x: 3, y: 5}); });
-  this.bindButtonPress(".tile-position-5-1", function (event) { this.emit("click", {x: 4, y: 0}); });
-  this.bindButtonPress(".tile-position-5-2", function (event) { this.emit("click", {x: 4, y: 1}); });
-  this.bindButtonPress(".tile-position-5-3", function (event) { this.emit("click", {x: 4, y: 2}); });
-  this.bindButtonPress(".tile-position-5-4", function (event) { this.emit("click", {x: 4, y: 3}); });
-  this.bindButtonPress(".tile-position-5-5", function (event) { this.emit("click", {x: 4, y: 4}); });
-  this.bindButtonPress(".tile-position-5-6", function (event) { this.emit("click", {x: 4, y: 5}); });
-  this.bindButtonPress(".tile-position-6-1", function (event) { this.emit("click", {x: 5, y: 0}); });
-  this.bindButtonPress(".tile-position-6-2", function (event) { this.emit("click", {x: 5, y: 1}); });
-  this.bindButtonPress(".tile-position-6-3", function (event) { this.emit("click", {x: 5, y: 2}); });
-  this.bindButtonPress(".tile-position-6-4", function (event) { this.emit("click", {x: 5, y: 3}); });
-  this.bindButtonPress(".tile-position-6-5", function (event) { this.emit("click", {x: 5, y: 4}); });
-  this.bindButtonPress(".tile-position-6-6", function (event) { this.emit("click", {x: 5, y: 5}); });
+  console.log('whattt');
+  this.bindButtonPress(".grid-position-1-1", function (event) { this.emit("click", {x: 0, y: 0}); });
+  this.bindButtonPress(".grid-position-1-2", function (event) { this.emit("click", {x: 0, y: 1}); });
+  this.bindButtonPress(".grid-position-1-3", function (event) { this.emit("click", {x: 0, y: 2}); });
+  this.bindButtonPress(".grid-position-1-4", function (event) { this.emit("click", {x: 0, y: 3}); });
+  this.bindButtonPress(".grid-position-1-5", function (event) { this.emit("click", {x: 0, y: 4}); });
+  this.bindButtonPress(".grid-position-1-6", function (event) { this.emit("click", {x: 0, y: 5}); });
+  this.bindButtonPress(".grid-position-2-1", function (event) { this.emit("click", {x: 1, y: 0}); });
+  this.bindButtonPress(".grid-position-2-2", function (event) { this.emit("click", {x: 1, y: 1}); });
+  this.bindButtonPress(".grid-position-2-3", function (event) { this.emit("click", {x: 1, y: 2}); });
+  this.bindButtonPress(".grid-position-2-4", function (event) { this.emit("click", {x: 1, y: 3}); });
+  this.bindButtonPress(".grid-position-2-5", function (event) { this.emit("click", {x: 1, y: 4}); });
+  this.bindButtonPress(".grid-position-2-6", function (event) { this.emit("click", {x: 1, y: 5}); });
+  this.bindButtonPress(".grid-position-3-1", function (event) { this.emit("click", {x: 2, y: 0}); });
+  this.bindButtonPress(".grid-position-3-2", function (event) { this.emit("click", {x: 2, y: 1}); });
+  this.bindButtonPress(".grid-position-3-3", function (event) { this.emit("click", {x: 2, y: 2}); });
+  this.bindButtonPress(".grid-position-3-4", function (event) { this.emit("click", {x: 2, y: 3}); });
+  this.bindButtonPress(".grid-position-3-5", function (event) { this.emit("click", {x: 2, y: 4}); });
+  this.bindButtonPress(".grid-position-3-6", function (event) { this.emit("click", {x: 2, y: 5}); });
+  this.bindButtonPress(".grid-position-4-1", function (event) { this.emit("click", {x: 3, y: 0}); });
+  this.bindButtonPress(".grid-position-4-2", function (event) { this.emit("click", {x: 3, y: 1}); });
+  this.bindButtonPress(".grid-position-4-3", function (event) { this.emit("click", {x: 3, y: 2}); });
+  this.bindButtonPress(".grid-position-4-4", function (event) { this.emit("click", {x: 3, y: 3}); });
+  this.bindButtonPress(".grid-position-4-5", function (event) { this.emit("click", {x: 3, y: 4}); });
+  this.bindButtonPress(".grid-position-4-6", function (event) { this.emit("click", {x: 3, y: 5}); });
+  this.bindButtonPress(".grid-position-5-1", function (event) { this.emit("click", {x: 4, y: 0}); });
+  this.bindButtonPress(".grid-position-5-2", function (event) { this.emit("click", {x: 4, y: 1}); });
+  this.bindButtonPress(".grid-position-5-3", function (event) { this.emit("click", {x: 4, y: 2}); });
+  this.bindButtonPress(".grid-position-5-4", function (event) { this.emit("click", {x: 4, y: 3}); });
+  this.bindButtonPress(".grid-position-5-5", function (event) { this.emit("click", {x: 4, y: 4}); });
+  this.bindButtonPress(".grid-position-5-6", function (event) { this.emit("click", {x: 4, y: 5}); });
+  this.bindButtonPress(".grid-position-6-1", function (event) { this.emit("click", {x: 5, y: 0}); });
+  this.bindButtonPress(".grid-position-6-2", function (event) { this.emit("click", {x: 5, y: 1}); });
+  this.bindButtonPress(".grid-position-6-3", function (event) { this.emit("click", {x: 5, y: 2}); });
+  this.bindButtonPress(".grid-position-6-4", function (event) { this.emit("click", {x: 5, y: 3}); });
+  this.bindButtonPress(".grid-position-6-5", function (event) { this.emit("click", {x: 5, y: 4}); });
+  this.bindButtonPress(".grid-position-6-6", function (event) { this.emit("click", {x: 5, y: 5}); });
 
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
-  this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -179,14 +179,11 @@ KeyboardInputManager.prototype.restart = function (event) {
   this.emit("restart");
 };
 
-KeyboardInputManager.prototype.keepPlaying = function (event) {
-  event.preventDefault();
-  this.emit("keepPlaying");
-};
-
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
+  console.log(button);
   if (button) {
+    console.log('binding...');
     button.addEventListener("click", fn.bind(this));
     button.addEventListener(this.eventTouchend, fn.bind(this));
   }

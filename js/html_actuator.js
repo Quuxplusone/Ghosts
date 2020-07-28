@@ -28,11 +28,6 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
   });
 };
 
-// Continues the game (both restart and keep playing)
-HTMLActuator.prototype.continueGame = function () {
-    this.clearMessage();
-};
-
 HTMLActuator.prototype.clearContainer = function (container) {
     while (container.firstChild) {
         container.removeChild(container.firstChild);
@@ -49,8 +44,8 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   var appearanceClasses = this.appearanceClasses(tile);
 
-  if (tile.isHighlighted) {
-    appearanceClasses.push("tile-highlighted");
+  if (tile.highlightType !== null) {
+    appearanceClasses.push("tile-highlighted-" + tile.highlightType);
     if (tile.selectedDirection !== null) {
         appearanceClasses.push("tile-bounce-" + tile.selectedDirection);
     }

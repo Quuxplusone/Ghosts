@@ -201,30 +201,6 @@ hr {
     opacity: 1;
   }
 }
-@-webkit-keyframes slide-up {
-  0% {
-    margin-top: 32%;
-  }
-  100% {
-    margin-top: 20%;
-  }
-}
-@-moz-keyframes slide-up {
-  0% {
-    margin-top: 32%;
-  }
-  100% {
-    margin-top: 20%;
-  }
-}
-@keyframes slide-up {
-  0% {
-    margin-top: 32%;
-  }
-  100% {
-    margin-top: 20%;
-  }
-}
 .game-container {
   margin-top: 40px;
   position: relative;
@@ -257,9 +233,9 @@ hr {
   z-index: 100;
   padding-top: 40px;
   text-align: center;
-  -webkit-animation: fade-in 800ms ease 1200ms;
-  -moz-animation: fade-in 800ms ease 1200ms;
-  animation: fade-in 800ms ease 1200ms;
+  -webkit-animation: fade-in 800ms ease 200ms;
+  -moz-animation: fade-in 800ms ease 200ms;
+  animation: fade-in 800ms ease 200ms;
   -webkit-animation-fill-mode: both;
   -moz-animation-fill-mode: both;
   animation-fill-mode: both;
@@ -275,17 +251,6 @@ hr {
   display: block;
   margin-top: 29px;
 }
-.game-message .mailing-list {
-  margin-top: 52px;
-}
-.game-message .mailing-list strong {
-  display: block;
-  margin-bottom: 10px;
-}
-.game-message .mailing-list .mailing-list-email-field {
-  width: 230px;
-  margin-right: 5px;
-}
 .game-message a {
   display: inline-block;
   background: #8f7a66;
@@ -298,9 +263,6 @@ hr {
   cursor: pointer;
   margin-left: 9px;
 }
-.game-message a.keep-playing-button {
-  display: none;
-}
 .game-message .score-sharing {
   display: inline-block;
   vertical-align: middle;
@@ -310,27 +272,11 @@ hr {
   background: rgba(237, 194, 46, 0.5);
   color: #f9f6f2;
 }
-.game-message.game-won a.keep-playing-button {
-  display: inline-block;
-}
 .game-message.game-won, .game-message.game-lost {
   display: block;
 }
 .game-message.game-won p, .game-message.game-lost p {
-  -webkit-animation: slide-up 1.5s ease-in-out 2500ms;
-  -moz-animation: slide-up 1.5s ease-in-out 2500ms;
-  animation: slide-up 1.5s ease-in-out 2500ms;
-  -webkit-animation-fill-mode: both;
-  -moz-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-.game-message.game-won .mailing-list, .game-message.game-lost .mailing-list {
-  -webkit-animation: fade-in 1.5s ease-in-out 2500ms;
-  -moz-animation: fade-in 1.5s ease-in-out 2500ms;
-  animation: fade-in 1.5s ease-in-out 2500ms;
-  -webkit-animation-fill-mode: both;
-  -moz-animation-fill-mode: both;
-  animation-fill-mode: both;
+  margin-top: 25%;
 }
 
 .grid-container {
@@ -591,6 +537,7 @@ hr {
 
 .tile {
   position: absolute;
+  pointer-events: none;
   -webkit-transition: 100ms ease-in-out;
   -moz-transition: 100ms ease-in-out;
   transition: 100ms ease-in-out;
@@ -604,12 +551,16 @@ hr {
   text-align: center;
   font-weight: bold;
   z-index: 10;
+  pointer-events: none;
   font-size: 55px;
 }
 .tile.tile-highlighted {
   z-index: 20;
 }
-.tile.tile-highlighted .tile-inner {
+.tile.tile-highlighted-light .tile-inner {
+  background: #dea488;
+}
+.tile.tile-highlighted-dark .tile-inner {
   background: sienna;
 }
 .tile.tile-bounce-0 .tile-inner {
@@ -911,9 +862,9 @@ hr {
     z-index: 100;
     padding-top: 40px;
     text-align: center;
-    -webkit-animation: fade-in 800ms ease 1200ms;
-    -moz-animation: fade-in 800ms ease 1200ms;
-    animation: fade-in 800ms ease 1200ms;
+    -webkit-animation: fade-in 800ms ease 200ms;
+    -moz-animation: fade-in 800ms ease 200ms;
+    animation: fade-in 800ms ease 200ms;
     -webkit-animation-fill-mode: both;
     -moz-animation-fill-mode: both;
     animation-fill-mode: both;
@@ -929,17 +880,6 @@ hr {
     display: block;
     margin-top: 29px;
   }
-  .game-message .mailing-list {
-    margin-top: 52px;
-  }
-  .game-message .mailing-list strong {
-    display: block;
-    margin-bottom: 10px;
-  }
-  .game-message .mailing-list .mailing-list-email-field {
-    width: 230px;
-    margin-right: 5px;
-  }
   .game-message a {
     display: inline-block;
     background: #8f7a66;
@@ -952,9 +892,6 @@ hr {
     cursor: pointer;
     margin-left: 9px;
   }
-  .game-message a.keep-playing-button {
-    display: none;
-  }
   .game-message .score-sharing {
     display: inline-block;
     vertical-align: middle;
@@ -964,27 +901,11 @@ hr {
     background: rgba(237, 194, 46, 0.5);
     color: #f9f6f2;
   }
-  .game-message.game-won a.keep-playing-button {
-    display: inline-block;
-  }
   .game-message.game-won, .game-message.game-lost {
     display: block;
   }
   .game-message.game-won p, .game-message.game-lost p {
-    -webkit-animation: slide-up 1.5s ease-in-out 2500ms;
-    -moz-animation: slide-up 1.5s ease-in-out 2500ms;
-    animation: slide-up 1.5s ease-in-out 2500ms;
-    -webkit-animation-fill-mode: both;
-    -moz-animation-fill-mode: both;
-    animation-fill-mode: both;
-  }
-  .game-message.game-won .mailing-list, .game-message.game-lost .mailing-list {
-    -webkit-animation: fade-in 1.5s ease-in-out 2500ms;
-    -moz-animation: fade-in 1.5s ease-in-out 2500ms;
-    animation: fade-in 1.5s ease-in-out 2500ms;
-    -webkit-animation-fill-mode: both;
-    -moz-animation-fill-mode: both;
-    animation-fill-mode: both;
+    margin-top: 25%;
   }
 
   .grid-container {
@@ -1142,15 +1063,6 @@ hr {
   }
   .game-message.game-won .score-sharing {
     margin-top: 10px;
-  }
-  .game-message.game-lost .mailing-list {
-    margin-top: 25px;
-  }
-  .game-message .mailing-list {
-    margin-top: 10px;
-  }
-  .game-message .mailing-list .mailing-list-email-field {
-    width: 180px;
   }
 
   .sharing > iframe, .sharing > span, .sharing > form {

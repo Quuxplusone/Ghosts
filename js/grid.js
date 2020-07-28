@@ -47,17 +47,17 @@ Grid.prototype.cellContent = function (cell) {
     }
 };
 
-Grid.prototype.highlightTile = function (position, direction) {
+Grid.prototype.highlightTile = function (highlightType, position, direction) {
     console.assert(this.withinBounds(position));
     for (var x = 0; x < this.size; ++x) {
         for (var y = 0; y < this.size; ++y) {
-            this.cells[x][y].isHighlighted = false;
+            this.cells[x][y].highlightType = null;
             this.cells[x][y].selectedDirection = null;
         }
     }
     if (position !== null) {
         var selectedTile = this.cells[position.x][position.y];
-        selectedTile.isHighlighted = true;
+        selectedTile.highlightType = highlightType;
         selectedTile.selectedDirection = direction;
     }
 }

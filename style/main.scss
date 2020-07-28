@@ -13,6 +13,7 @@ $text-color: #776e65;
 $bright-text-color: #f9f6f2;
 
 $tile-color: #eee4da;
+$highlight-color: sienna;
 $tile-gold-color: #edc22e;
 $tile-gold-glow-color: lighten($tile-gold-color, 15%);
 
@@ -205,18 +206,6 @@ hr {
   }
 }
 
-@include keyframes(slide-up) {
-  0% {
-    margin-top: 32%;
-    // margin-top: 222px;
-  }
-
-  100% {
-    margin-top: 20%;
-    // margin-top: 150px;
-  }
-}
-
 // Game field mixin used to render CSS at different width
 @mixin game-field {
   .game-container {
@@ -274,28 +263,10 @@ hr {
       margin-top: 29px;
     }
 
-    .mailing-list {
-      margin-top: 52px;
-
-      strong {
-        display: block;
-        margin-bottom: 10px;
-      }
-
-      .mailing-list-email-field {
-        width: 230px;
-        margin-right: 5px;
-      }
-    }
-
     a {
       @include button;
       margin-left: 9px;
       // margin-top: 59px;
-
-      &.keep-playing-button {
-        display: none;
-      }
     }
 
     .score-sharing {
@@ -304,29 +275,19 @@ hr {
       margin-left: 10px;
     }
 
-    @include animation(fade-in 800ms ease $transition-speed * 12);
+    @include animation(fade-in 800ms ease 200ms);
     @include animation-fill-mode(both);
 
     &.game-won {
       background: rgba($tile-gold-color, .5);
       color: $bright-text-color;
-
-      a.keep-playing-button {
-        display: inline-block;
-      }
     }
 
     &.game-won, &.game-lost {
       display: block;
 
       p {
-        @include animation(slide-up 1.5s ease-in-out $transition-speed * 25);
-        @include animation-fill-mode(both);
-      }
-
-      .mailing-list {
-        @include animation(fade-in 1.5s ease-in-out $transition-speed * 25);
-        @include animation-fill-mode(both);
+        margin-top: 25%;
       }
     }
   }
@@ -395,6 +356,7 @@ hr {
 
 .tile {
   position: absolute; // Makes transforms relative to the top-left corner
+  pointer-events: none;
 
   .tile-inner {
     border-radius: $tile-border-radius;
@@ -403,6 +365,7 @@ hr {
     text-align: center;
     font-weight: bold;
     z-index: 10;
+    pointer-events: none;
 
     font-size: 55px;
   }
@@ -416,8 +379,11 @@ hr {
   &.tile-highlighted {
     z-index: 20;
   }
-  &.tile-highlighted .tile-inner {
-    background: sienna;
+  &.tile-highlighted-light .tile-inner {
+    background: lighten($highlight-color, 30%);
+  }
+  &.tile-highlighted-dark .tile-inner {
+    background: $highlight-color;
   }
   &.tile-bounce-0 .tile-inner {
     animation: bounce-up 0.25s infinite alternate;
@@ -602,18 +568,6 @@ hr {
 
     &.game-won .score-sharing {
       margin-top: 10px;
-    }
-
-    &.game-lost .mailing-list {
-      margin-top: 25px;
-    }
-
-    .mailing-list {
-      margin-top: 10px;
-
-      .mailing-list-email-field {
-        width: 180px;
-      }
     }
   }
 

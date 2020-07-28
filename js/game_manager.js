@@ -16,7 +16,7 @@ function GameManager(InputManager, Actuator, StorageManager) {
 // Restart the game
 GameManager.prototype.restart = function () {
     this.storageManager.clearGameState();
-    this.actuator.continueGame(); // Clear the game won/lost message
+    this.actuator.clearMessage(); // Clear the game won/lost message
     this.setup();
 };
 
@@ -25,7 +25,15 @@ GameManager.prototype.isGameTerminated = function () {
     return this.lost || this.won;
 };
 
-// Set up the game
+GameManager.prototype.serialize = function () {
+  return {
+    grid: this.grid.serialize(),
+    lost: this.lost,
+    won: this.won,
+    capturedGhosts: this.capturedGhosts,
+  };
+};
+
 GameManager.prototype.setup = function () {
     var previousState = this.storageManager.getGameState();
 
@@ -34,7 +42,6 @@ GameManager.prototype.setup = function () {
         this.grid = new Grid(previousState.grid.size, previousState.grid.cells);
         this.lost = previousState.lost;
         this.won = previousState.won;
-        this.keepPlaying = previousState.keepPlaying;
         this.capturedGhosts = previousState.capturedGhosts;
     } else {
         this.grid = new Grid(this.size);
@@ -53,8 +60,6 @@ GameManager.prototype.setup = function () {
     this.inputState = 0;
     this.highlightedTile = {x: 2, y: 2};
     this.selectedDirection = null;
-    this.grid.highlightTile(this.highlightedTile, this.selectedDirection);
-
     this.actuate();
 };
 
@@ -103,7 +108,12 @@ GameManager.prototype.actuate = function () {
         this.storageManager.setGameState(this.serialize());
     }
 
-    this.grid.highlightTile(this.highlightedTile, this.selectedDirection);
+    if (this.inputState === 0) {
+        this.grid.highlightTile('light', this.highlightedTile, this.selectedDirection);
+    } else {
+        this.grid.highlightTile('dark', this.highlightedTile, this.selectedDirection);
+    }
+
     this.actuator.actuate(this.grid, {
         lost:       this.lost,
         won:        this.won,
@@ -111,17 +121,8 @@ GameManager.prototype.actuate = function () {
     });
 };
 
-// Represent the current game as an object
-GameManager.prototype.serialize = function () {
-  return {
-    grid:        this.grid.serialize(),
-    lost:        this.lost,
-    won:         this.won,
-  };
-};
-
 GameManager.prototype.arrow = function (direction) {
-    console.log("ok, arrow", this);
+    console.log("ok, arrow", this, direction);
 
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
@@ -156,6 +157,8 @@ GameManager.prototype.arrow = function (direction) {
 };
 
 GameManager.prototype.enter = function (dummy) {
+    console.log("ok, enter", this);
+
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     // Input UI states:
@@ -177,7 +180,8 @@ GameManager.prototype.enter = function (dummy) {
 };
 
 GameManager.prototype.click = function (position) {
-    console.log("click-", position);
+    console.log("ok, click", this, position);
+
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
     if (this.inputState === 0) {
         var tile = this.grid.cellContent(position);
@@ -201,22 +205,34 @@ GameManager.prototype.click = function (position) {
         }
         if (this.isLegalMove(this.highlightedTile, this.selectedDirection)) {
             this.inputState = 2;
-        } else {
+        } else if (this.grid.cellContent(position).owner === 'human') {
             this.highlightedTile = position;
             this.selectedDirection = null;
-            this.inputState = 0;
+            this.inputState = 1;
+        } else {
+            this.selectedDirection = null;
+            this.inputState = 1;
         }
     } else if (this.inputState === 2) {
         var d = this.getVector(this.selectedDirection);
         var target = {x: this.highlightedTile.x + d.x, y: this.highlightedTile.y + d.y};
         if (this.positionsEqual(position, target)) {
             this.commitMove();
+        } else if (this.grid.cellContent(position).owner === 'human') {
+            this.highlightedTile = position;
+            this.selectedDirection = null;
+            this.inputState = 1;
+        } else {
+            this.selectedDirection = null;
+            this.inputState = 1;
         }
     }
     this.actuate();
 };
 
 GameManager.prototype.swipe = function (position_and_direction) {
+    console.log("ok, swipe", this, position_and_direction);
+
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
     this.actuate();
 };
