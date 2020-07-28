@@ -42,7 +42,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   var position  = { x: tile.x, y: tile.y };
   var positionClass = this.positionClass(tile.previousPosition ? tile.previousPosition : position);
 
-  var appearanceClasses = this.appearanceClasses(tile);
+  var appearanceClasses = [ this.valueClass(tile) ];
 
   if (tile.highlightType !== null) {
     appearanceClasses.push("tile-highlighted-" + tile.highlightType);
@@ -105,20 +105,16 @@ HTMLActuator.prototype.valueClass = function (tile) {
     }
 };
 
-HTMLActuator.prototype.appearanceClasses = function (tile) {
-  return [this.valueClass(tile)];
-};
-
 HTMLActuator.prototype.message = function (won) {
-  var type    = won ? "game-won" : "game-lost";
-  var message = won ? "You win!" : "You lose!";
+    var type    = won ? "game-won" : "game-lost";
+    var message = won ? "You win!" : "You lose!";
 
-  this.messageContainer.classList.add(type);
-  this.messageContainer.getElementsByTagName("p")[0].textContent = message;
+    this.messageContainer.classList.add(type);
+    this.messageContainer.getElementsByTagName("p")[0].textContent = message;
 };
 
 HTMLActuator.prototype.clearMessage = function () {
-  // IE only takes one value to remove at a time.
-  this.messageContainer.classList.remove("game-won");
-  this.messageContainer.classList.remove("game-lost");
+    // IE only takes one value to remove at a time.
+    this.messageContainer.classList.remove("game-won");
+    this.messageContainer.classList.remove("game-lost");
 };

@@ -1,8 +1,9 @@
-function GameManager(InputManager, Actuator, StorageManager) {
+function GameManager(InputManager, Actuator, StorageManager, AIPlayer) {
     this.size           = 6; // Size of the grid
     this.inputManager   = new InputManager;
     this.storageManager = new StorageManager("ghosts");
     this.actuator       = new Actuator;
+    this.aiPlayer       = new AIPlayer;
 
     this.inputManager.on("arrow", this.arrow.bind(this));
     this.inputManager.on("enter", this.enter.bind(this));
@@ -30,7 +31,9 @@ GameManager.prototype.serialize = function () {
     grid: this.grid.serialize(),
     lost: this.lost,
     won: this.won,
-    capturedGhosts: this.capturedGhosts,
+    capturedByHuman: this.capturedByHuman,
+    capturedByAI: this.capturedByAI,
+    isAITurn: this.isAITurn,
   };
 };
 
@@ -42,12 +45,16 @@ GameManager.prototype.setup = function () {
         this.grid = new Grid(previousState.grid.size, previousState.grid.cells);
         this.lost = previousState.lost;
         this.won = previousState.won;
-        this.capturedGhosts = previousState.capturedGhosts;
+        this.capturedByHuman = previousState.capturedByHuman;
+        this.capturedByAI = previousState.capturedByAI;
+        this.isAITurn = previousState.isAITurn;
     } else {
         this.grid = new Grid(this.size);
         this.lost = false;
         this.won = false;
-        this.capturedGhosts = [];
+        this.capturedByHuman = [];
+        this.capturedByAI = [];
+        this.isAITurn = (Math.round(Math.random()) == 0);
 
         this.addInitialTiles();
     }
@@ -60,7 +67,17 @@ GameManager.prototype.setup = function () {
     this.inputState = 0;
     this.highlightedTile = {x: 2, y: 2};
     this.selectedDirection = null;
-    this.actuate();
+
+    if (this.isAITurn) {
+        var self = this;
+        window.setTimeout(function () {
+            var result = self.aiPlayer.chooseMove(self);
+            self.commitMoveForAI(result.source, result.direction);
+            self.actuate();
+        }, 500);
+    } else {
+        this.actuate();
+    }
 };
 
 GameManager.prototype.shuffleArray = function(array) {
@@ -100,7 +117,6 @@ GameManager.prototype.addInitialTiles = function () {
     }
 };
 
-// Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
     if (this.won || this.lost) {
         this.storageManager.clearGameState();
@@ -138,7 +154,7 @@ GameManager.prototype.arrow = function (direction) {
             y: Math.min(Math.max(0, this.highlightedTile.y + d.y), 5),
         };
     } else if (this.inputState == 1) {
-        if (this.isLegalMove(this.highlightedTile, direction)) {
+        if (this.isLegalMoveForHuman(this.highlightedTile, direction)) {
             this.selectedDirection = direction;
             this.inputState = 2;
         } else {
@@ -174,7 +190,7 @@ GameManager.prototype.enter = function (dummy) {
     } else if (this.inputState === 1) {
         this.inputState = 0;
     } else if (this.inputState === 2) {
-        this.commitMove();
+        this.commitMoveForHuman();
     }
     this.actuate();
 };
@@ -183,6 +199,7 @@ GameManager.prototype.click = function (position) {
     console.log("ok, click", this, position);
 
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
+
     if (this.inputState === 0) {
         var tile = this.grid.cellContent(position);
         if (tile.owner === 'human') {
@@ -206,7 +223,7 @@ GameManager.prototype.click = function (position) {
         } else {
             this.selectedDirection = null;
         }
-        if (this.isLegalMove(this.highlightedTile, this.selectedDirection)) {
+        if (this.isLegalMoveForHuman(this.highlightedTile, this.selectedDirection)) {
             this.inputState = 2;
         } else if (this.grid.cellContent(position).owner === 'human') {
             this.highlightedTile = position;
@@ -220,7 +237,7 @@ GameManager.prototype.click = function (position) {
         var d = this.getVector(this.selectedDirection);
         var target = {x: this.highlightedTile.x + d.x, y: this.highlightedTile.y + d.y};
         if (this.positionsEqual(position, target)) {
-            this.commitMove();
+            this.commitMoveForHuman();
         } else if (this.grid.cellContent(position).owner === 'human') {
             this.highlightedTile = position;
             this.selectedDirection = null;
@@ -237,10 +254,15 @@ GameManager.prototype.swipe = function (position_and_direction) {
     console.log("ok, swipe", this, position_and_direction);
 
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
+
     this.actuate();
 };
 
-GameManager.prototype.isLegalMove = function (source, direction) {
+GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
+    if (this.isAITurn) {
+        return false;
+    }
+
     if (source === null || direction === null) {
         return false;
     }
@@ -257,17 +279,47 @@ GameManager.prototype.isLegalMove = function (source, direction) {
     if (sourceTile.owner !== 'human' || targetTile.owner === 'human') {
         return false;
     }
-    if (sourceTile.color === 'red' && targetTile.isExit()) {
+    if (sourceTile.color === 'red' && targetTile.isExitForHuman()) {
         return false;
     }
-    if (targetTile.isExitForOpponent()) {
+    if (targetTile.isExitForAI()) {
+        return false;
+    }
+    return true;
+};
+
+GameManager.prototype.isLegalMoveForAI = function (source, direction) {
+    if (!this.isAITurn) {
+        return false;
+    }
+
+    if (source === null || direction === null) {
+        return false;
+    }
+    if (!this.grid.withinBounds(source)) {
+        return false;
+    }
+    var d = this.getVector(direction);
+    var target = {x: source.x + d.x, y: source.y + d.y};
+    if (!this.grid.withinBounds(target)) {
+        return false;
+    }
+    var sourceTile = this.grid.cellContent(source);
+    var targetTile = this.grid.cellContent(target);
+    if (sourceTile.owner !== 'ai' || targetTile.owner === 'ai') {
+        return false;
+    }
+    if (sourceTile.color === 'red' && targetTile.isExitForAI()) {
+        return false;
+    }
+    if (targetTile.isExitForHuman()) {
         return false;
     }
     return true;
 };
 
 // Move tiles on the grid in the specified direction
-GameManager.prototype.commitMove = function () {
+GameManager.prototype.commitMoveForHuman = function () {
     // 0: up, 1: right, 2: down, 3: left
 
     var d = this.getVector(this.selectedDirection);
@@ -280,7 +332,7 @@ GameManager.prototype.commitMove = function () {
     console.assert(sourceTile.owner === 'human');
     console.assert(targetTile.owner !== 'human');
     if (targetTile.owner === 'ai') {
-        this.capturedGhosts.push(targetTile.color);
+        this.capturedByHuman.push(targetTile.color);
     }
     targetTile.color = sourceTile.color;
     targetTile.owner = sourceTile.owner;
@@ -288,11 +340,11 @@ GameManager.prototype.commitMove = function () {
     sourceTile.owner = null;
     sourceTile.color = null;
 
-    if (targetTile.isExit() && targetTile.color === 'blue') {
+    if (targetTile.isExitForHuman() && targetTile.color === 'blue') {
         this.won = true;
-    } else if (this.capturedGhosts.filter(function(c){ return c === 'blue'; }).length === 4) {
+    } else if (this.capturedByHuman.filter(function(c){ return c === 'blue'; }).length === 4) {
         this.won = true;
-    } else if (this.capturedGhosts.filter(function(c){ return c === 'red'; }).length === 4) {
+    } else if (this.capturedByHuman.filter(function(c){ return c === 'red'; }).length === 4) {
         this.lost = true;
     }
 
@@ -302,6 +354,44 @@ GameManager.prototype.commitMove = function () {
     };
     this.selectedDirection = null;
     this.inputState = 0;
+    this.isAITurn = true;
+
+    var self = this;
+    window.setTimeout(function () {
+        var result = self.aiPlayer.chooseMove(self);
+        self.commitMoveForAI(result.source, result.direction);
+        self.actuate();
+    }, 500);
+};
+
+GameManager.prototype.commitMoveForAI = function (source, direction) {
+    var d = this.getVector(direction);
+    var target = {x: source.x + d.x, y: source.y + d.y};
+
+    console.assert(this.grid.withinBounds(source));
+    console.assert(this.grid.withinBounds(target));
+    var sourceTile = this.grid.cellContent(source);
+    var targetTile = this.grid.cellContent(target);
+    console.assert(sourceTile.owner === 'ai');
+    console.assert(targetTile.owner !== 'ai');
+    if (targetTile.owner === 'human') {
+        this.capturedByAI.push(targetTile.color);
+    }
+    targetTile.color = sourceTile.color;
+    targetTile.owner = sourceTile.owner;
+    targetTile.previousPosition = sourceTile.position;
+    sourceTile.owner = null;
+    sourceTile.color = null;
+
+    if (targetTile.isExitForAI() && targetTile.color === 'blue') {
+        this.lost = true;
+    } else if (this.capturedByAI.filter(function(c){ return c === 'blue'; }).length === 4) {
+        this.lost = true;
+    } else if (this.capturedByAI.filter(function(c){ return c === 'red'; }).length === 4) {
+        this.won = true;
+    }
+
+    this.isAITurn = false;
 };
 
 // Get the vector representing the chosen direction
