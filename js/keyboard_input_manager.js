@@ -136,12 +136,9 @@ KeyboardInputManager.prototype.listen = function () {
       touchStartClientX = event.touches[0].clientX;
       touchStartClientY = event.touches[0].clientY;
     }
-
-    event.preventDefault();
   });
 
   gameContainer.addEventListener(this.eventTouchmove, function (event) {
-    event.preventDefault();
   });
 
   gameContainer.addEventListener(this.eventTouchend, function (event) {
@@ -170,6 +167,7 @@ KeyboardInputManager.prototype.listen = function () {
     if (Math.max(absDx, absDy) > 10) {
       // (right : left) : (down : up)
       self.emit("arrow", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+      event.preventDefault();
     }
   });
 };

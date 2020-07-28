@@ -376,14 +376,17 @@ hr {
   -moz-transition-property: -moz-transform;
   transition-property: transform;
 
-  &.tile-highlighted {
+  &.tile-highlighted-light {
     z-index: 20;
+    .tile-inner {
+      background: lighten($highlight-color, 30%);
+    }
   }
-  &.tile-highlighted-light .tile-inner {
-    background: lighten($highlight-color, 30%);
-  }
-  &.tile-highlighted-dark .tile-inner {
-    background: $highlight-color;
+  &.tile-highlighted-dark {
+    z-index: 20;
+    .tile-inner {
+      background: $highlight-color;
+    }
   }
   &.tile-bounce-0 .tile-inner {
     animation: bounce-up 0.25s infinite alternate;
@@ -492,8 +495,8 @@ hr {
 @include smaller($mobile-threshold) {
   // Redefine variables for smaller screens
   $field-width: 280px !global;
-  $grid-spacing: 10px !global;
-  $grid-row-cells: 4 !global;
+  $grid-spacing: 6px !global;
+  $grid-row-cells: 6 !global;
   $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells !global;
   $tile-border-radius: 3px !global;
   $game-container-margin-top: 17px !global;
@@ -545,11 +548,6 @@ hr {
 
   // Render the game field at the right width
   @include game-field;
-
-  // Rest of the font-size adjustments in the tile class
-  .tile .tile-inner {
-    font-size: 35px;
-  }
 
   .game-message {
     padding-top: 0;
