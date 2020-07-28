@@ -138,8 +138,6 @@ GameManager.prototype.actuate = function () {
 };
 
 GameManager.prototype.arrow = function (direction) {
-    console.log("ok, arrow", this, direction);
-
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     // Input UI states:
@@ -173,8 +171,6 @@ GameManager.prototype.arrow = function (direction) {
 };
 
 GameManager.prototype.enter = function (dummy) {
-    console.log("ok, enter", this);
-
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     // Input UI states:
@@ -190,14 +186,12 @@ GameManager.prototype.enter = function (dummy) {
     } else if (this.inputState === 1) {
         this.inputState = 0;
     } else if (this.inputState === 2) {
-        this.commitMoveForHuman();
+        this.commitMoveForHuman(this.highlightedTile, this.selectedDirection);
     }
     this.actuate();
 };
 
 GameManager.prototype.click = function (position) {
-    console.log("ok, click", this, position);
-
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     if (this.inputState === 0) {
@@ -234,10 +228,9 @@ GameManager.prototype.click = function (position) {
             this.inputState = 1;
         }
     } else if (this.inputState === 2) {
-        var d = this.getVector(this.selectedDirection);
-        var target = {x: this.highlightedTile.x + d.x, y: this.highlightedTile.y + d.y};
+        var target = this.addDirection(this.highlightedTile, this.selectedDirection);
         if (this.positionsEqual(position, target)) {
-            this.commitMoveForHuman();
+            this.commitMoveForHuman(this.highlightedTile, this.selectedDirection);
         } else if (this.grid.cellContent(position).owner === 'human') {
             this.highlightedTile = position;
             this.selectedDirection = null;
@@ -269,8 +262,7 @@ GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
     if (!this.grid.withinBounds(source)) {
         return false;
     }
-    var d = this.getVector(direction);
-    var target = {x: source.x + d.x, y: source.y + d.y};
+    var target = this.addDirection(source, direction);
     if (!this.grid.withinBounds(target)) {
         return false;
     }
@@ -299,8 +291,7 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
     if (!this.grid.withinBounds(source)) {
         return false;
     }
-    var d = this.getVector(direction);
-    var target = {x: source.x + d.x, y: source.y + d.y};
+    var target = this.addDirection(source, direction);
     if (!this.grid.withinBounds(target)) {
         return false;
     }
@@ -319,12 +310,10 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
 };
 
 // Move tiles on the grid in the specified direction
-GameManager.prototype.commitMoveForHuman = function () {
+GameManager.prototype.commitMoveForHuman = function (source, direction) {
     // 0: up, 1: right, 2: down, 3: left
 
-    var d = this.getVector(this.selectedDirection);
-    var source = {x: this.highlightedTile.x, y: this.highlightedTile.y};
-    var target = {x: source.x + d.x, y: source.y + d.y};
+    var target = this.addDirection(source, direction);
     console.assert(this.grid.withinBounds(source));
     console.assert(this.grid.withinBounds(target));
     var sourceTile = this.grid.cellContent(source);
@@ -348,10 +337,7 @@ GameManager.prototype.commitMoveForHuman = function () {
         this.lost = true;
     }
 
-    this.highlightedTile = {
-        x: Math.min(Math.max(0, this.highlightedTile.x + d.x), 5),
-        y: Math.min(Math.max(0, this.highlightedTile.y + d.y), 5),
-    };
+    this.highlightedTile = target;
     this.selectedDirection = null;
     this.inputState = 0;
     this.isAITurn = true;
@@ -365,11 +351,7 @@ GameManager.prototype.commitMoveForHuman = function () {
 };
 
 GameManager.prototype.commitMoveForAI = function (source, direction) {
-    var d = this.getVector(direction);
-    var target = {x: source.x + d.x, y: source.y + d.y};
-
-    console.assert(this.grid.withinBounds(source));
-    console.assert(this.grid.withinBounds(target));
+    var target = this.addDirection(source, direction);
     var sourceTile = this.grid.cellContent(source);
     var targetTile = this.grid.cellContent(target);
     console.assert(sourceTile.owner === 'ai');
@@ -405,6 +387,14 @@ GameManager.prototype.getVector = function (direction) {
   };
 
   return map[direction];
+};
+
+GameManager.prototype.addDirection = function (source, direction) {
+    var d = this.getVector(direction);
+    return {
+        x: source.x + d.x,
+        y: source.y + d.y,
+    };
 };
 
 GameManager.prototype.positionsEqual = function (first, second) {

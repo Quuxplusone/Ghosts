@@ -58,13 +58,11 @@ HTMLActuator.prototype.addTile = function (tile) {
 
   if (tile.previousPosition !== null) {
     // Make sure that the tile gets rendered in the previous position first
-    console.log('before', tile);
     tile.previousPosition = null;
     this.applyClasses(wrapper, classes);
     window.requestAnimationFrame(function () {
       self.applyClasses(wrapper, classes);
       window.requestAnimationFrame(function () {
-        console.log('raf', tile);
         classes[1] = self.positionClass({ x: tile.x, y: tile.y });
         self.applyClasses(wrapper, classes); // Update the position
       });

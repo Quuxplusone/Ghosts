@@ -23,7 +23,6 @@ KeyboardInputManager.prototype.on = function (event, callback) {
 };
 
 KeyboardInputManager.prototype.emit = function (event, data) {
-    console.log("emit(", event, ",", data, ")");
     var callbacks = this.events[event];
     if (callbacks) {
         callbacks.forEach(function (callback) {
@@ -76,7 +75,6 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
-  console.log('whattt');
   this.bindButtonPress(".grid-position-1-1", function (event) { this.emit("click", {x: 0, y: 0}); });
   this.bindButtonPress(".grid-position-1-2", function (event) { this.emit("click", {x: 0, y: 1}); });
   this.bindButtonPress(".grid-position-1-3", function (event) { this.emit("click", {x: 0, y: 2}); });
@@ -179,9 +177,7 @@ KeyboardInputManager.prototype.restart = function (event) {
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   var button = document.querySelector(selector);
-  console.log(button);
   if (button) {
-    console.log('binding...');
     button.addEventListener("click", fn.bind(this));
     button.addEventListener(this.eventTouchend, fn.bind(this));
   }
