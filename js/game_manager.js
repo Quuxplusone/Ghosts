@@ -188,6 +188,9 @@ GameManager.prototype.click = function (position) {
         if (tile.owner === 'human') {
             this.highlightedTile = {x: position.x, y: position.y};
             this.inputState = 1;
+        } else {
+            this.highlightedTile = {x: position.x, y: position.y};
+            this.inputState = 0;
         }
     } else if (this.inputState === 1) {
         var hx = this.highlightedTile.x;

@@ -358,6 +358,12 @@ hr {
   position: absolute; // Makes transforms relative to the top-left corner
   pointer-events: none;
 
+  // Movement transition
+  @include transition($transition-speed ease-in-out);
+  -webkit-transition-property: -webkit-transform;
+  -moz-transition-property: -moz-transform;
+  transition-property: transform;
+
   .tile-inner {
     border-radius: $tile-border-radius;
 
@@ -369,12 +375,6 @@ hr {
 
     font-size: 55px;
   }
-
-  // Movement transition
-  @include transition($transition-speed ease-in-out);
-  -webkit-transition-property: -webkit-transform;
-  -moz-transition-property: -moz-transform;
-  transition-property: transform;
 
   &.tile-highlighted-light {
     z-index: 20;

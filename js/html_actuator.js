@@ -40,7 +40,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   var wrapper   = document.createElement("div");
   var inner     = document.createElement("div");
   var position  = { x: tile.x, y: tile.y };
-  var positionClass = this.positionClass(position);
+  var positionClass = this.positionClass(tile.previousPosition ? tile.previousPosition : position);
 
   var appearanceClasses = this.appearanceClasses(tile);
 
@@ -54,21 +54,20 @@ HTMLActuator.prototype.addTile = function (tile) {
   // We can't use classlist because it somehow glitches when replacing classes
   var classes = ["tile", positionClass].concat(appearanceClasses);
 
-  this.applyClasses(wrapper, classes);
-
   inner.classList.add("tile-inner");
-  inner.innerHTML =
-      (tile.owner === 'ai') ? '' :
-      (tile.owner === null) ? ('') :
-      (tile.color === 'blue') ? ('') :
-      (tile.color === 'red') ? ('') :
-      'X';
 
-  if (tile.previousPosition) {
+  if (tile.previousPosition !== null) {
     // Make sure that the tile gets rendered in the previous position first
+    console.log('before', tile);
+    tile.previousPosition = null;
+    this.applyClasses(wrapper, classes);
     window.requestAnimationFrame(function () {
-      classes[1] = self.positionClass({ x: tile.x, y: tile.y });
-      self.applyClasses(wrapper, classes); // Update the position
+      self.applyClasses(wrapper, classes);
+      window.requestAnimationFrame(function () {
+        console.log('raf', tile);
+        classes[1] = self.positionClass({ x: tile.x, y: tile.y });
+        self.applyClasses(wrapper, classes); // Update the position
+      });
     });
   } else {
     this.applyClasses(wrapper, classes);

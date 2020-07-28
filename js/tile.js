@@ -2,7 +2,7 @@
 function Tile(position, color, owner) {
   this.x                = position.x;
   this.y                = position.y;
-  this.previousPosition = {x: this.x, y: this.y};
+  this.previousPosition = null;
   this.color            = color;  // 'blue' or 'red' or null
   this.owner            = owner;  // 'human' or 'ai' or null
   this.isHighlighted = false;
