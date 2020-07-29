@@ -10,6 +10,34 @@ Grid.newGame = function () {
     self.isAITurn = false;
     self.addInitialTiles();
     self.isAITurn = (Math.round(Math.random()) == 0);
+
+    var pieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
+    Util.shuffleArray(pieces);
+    this.insertTile(new Tile({x: 1, y: 5}, pieces[0], 'human'));
+    this.insertTile(new Tile({x: 2, y: 5}, pieces[1], 'human'));
+    this.insertTile(new Tile({x: 3, y: 5}, pieces[2], 'human'));
+    this.insertTile(new Tile({x: 4, y: 5}, pieces[3], 'human'));
+    this.insertTile(new Tile({x: 1, y: 4}, pieces[4], 'human'));
+    this.insertTile(new Tile({x: 2, y: 4}, pieces[5], 'human'));
+    this.insertTile(new Tile({x: 3, y: 4}, pieces[6], 'human'));
+    this.insertTile(new Tile({x: 4, y: 4}, pieces[7], 'human'));
+    Util.shuffleArray(pieces);
+    this.insertTile(new Tile({x: 1, y: 0}, pieces[0], 'ai'));
+    this.insertTile(new Tile({x: 2, y: 0}, pieces[1], 'ai'));
+    this.insertTile(new Tile({x: 3, y: 0}, pieces[2], 'ai'));
+    this.insertTile(new Tile({x: 4, y: 0}, pieces[3], 'ai'));
+    this.insertTile(new Tile({x: 1, y: 1}, pieces[4], 'ai'));
+    this.insertTile(new Tile({x: 2, y: 1}, pieces[5], 'ai'));
+    this.insertTile(new Tile({x: 3, y: 1}, pieces[6], 'ai'));
+    this.insertTile(new Tile({x: 4, y: 1}, pieces[7], 'ai'));
+    for (var x = 0; x < 6; ++x) {
+        for (var y = 0; y < 6; ++y) {
+            if ((1 <= x && x <= 4) && (y <= 1 || y >= 4)) {
+                continue;
+            }
+            this.insertTile(new Tile({x: x, y: y}, null, null));
+        }
+    }
     return self;
 };
 
@@ -53,36 +81,6 @@ Grid.prototype.serialize = function () {
         capturedByAI: this.capturedByAI,
         isAITurn: this.isAITurn,
     };
-};
-
-Grid.prototype.addInitialTiles = function () {
-    var pieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
-    Util.shuffleArray(pieces);
-    this.insertTile(new Tile({x: 1, y: 5}, pieces[0], 'human'));
-    this.insertTile(new Tile({x: 2, y: 5}, pieces[1], 'human'));
-    this.insertTile(new Tile({x: 3, y: 5}, pieces[2], 'human'));
-    this.insertTile(new Tile({x: 4, y: 5}, pieces[3], 'human'));
-    this.insertTile(new Tile({x: 1, y: 4}, pieces[4], 'human'));
-    this.insertTile(new Tile({x: 2, y: 4}, pieces[5], 'human'));
-    this.insertTile(new Tile({x: 3, y: 4}, pieces[6], 'human'));
-    this.insertTile(new Tile({x: 4, y: 4}, pieces[7], 'human'));
-    Util.shuffleArray(pieces);
-    this.insertTile(new Tile({x: 1, y: 0}, pieces[0], 'ai'));
-    this.insertTile(new Tile({x: 2, y: 0}, pieces[1], 'ai'));
-    this.insertTile(new Tile({x: 3, y: 0}, pieces[2], 'ai'));
-    this.insertTile(new Tile({x: 4, y: 0}, pieces[3], 'ai'));
-    this.insertTile(new Tile({x: 1, y: 1}, pieces[4], 'ai'));
-    this.insertTile(new Tile({x: 2, y: 1}, pieces[5], 'ai'));
-    this.insertTile(new Tile({x: 3, y: 1}, pieces[6], 'ai'));
-    this.insertTile(new Tile({x: 4, y: 1}, pieces[7], 'ai'));
-    for (var x = 0; x < 6; ++x) {
-        for (var y = 0; y < 6; ++y) {
-            if ((1 <= x && x <= 4) && (y <= 1 || y >= 4)) {
-                continue;
-            }
-            this.insertTile(new Tile({x: x, y: y}, null, null));
-        }
-    }
 };
 
 Grid.prototype.at = function (cell) {
