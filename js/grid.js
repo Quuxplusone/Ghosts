@@ -1,9 +1,28 @@
-function Grid(size, previousState) {
-    this.size = size;
-    this.cells = this.fromState(previousState);
+function Grid() {
+    this.size = 6;
 }
 
-Grid.prototype.fromState = function (state) {
+Grid.newGame = function () {
+    var self = new Grid();
+    self.cells = self.cellsFromState(null);
+    self.capturedByHuman = [];
+    self.capturedByAI = [];
+    self.isAITurn = false;
+    self.addInitialTiles();
+    self.isAITurn = (Math.round(Math.random()) == 0);
+    return self;
+};
+
+Grid.fromPreviousState = function (previousState) {
+    var self = new Grid();
+    self.cells = self.cellsFromState(previousState.cells);
+    self.capturedByHuman = previousState.capturedByHuman;
+    self.capturedByAI = previousState.capturedByAI;
+    self.isAITurn = previousState.isAITurn;
+    return self;
+};
+
+Grid.prototype.cellsFromState = function (state) {
     var cells = [];
     for (var x = 0; x < this.size; x++) {
         var row = cells[x] = [];
@@ -17,6 +36,23 @@ Grid.prototype.fromState = function (state) {
         }
     }
     return cells;
+};
+
+Grid.prototype.serialize = function () {
+    var cellState = [];
+    for (var x = 0; x < this.size; x++) {
+        var row = cellState[x] = [];
+        for (var y = 0; y < this.size; y++) {
+            row.push(this.cells[x][y].serialize());
+        }
+    }
+    return {
+        size: this.size,
+        cells: cellState,
+        capturedByHuman: this.capturedByHuman,
+        capturedByAI: this.capturedByAI,
+        isAITurn: this.isAITurn,
+    };
 };
 
 Grid.prototype.addInitialTiles = function () {
@@ -49,10 +85,6 @@ Grid.prototype.addInitialTiles = function () {
     }
 };
 
-Grid.prototype.clone = function () {
-    return new Grid(this.size, this.cells);
-}
-
 Grid.prototype.at = function (cell) {
     console.assert(this.withinBounds(cell));
     return this.cells[cell.x][cell.y];
@@ -71,7 +103,7 @@ Grid.prototype.highlightTile = function (highlightType, position, direction) {
         selectedTile.highlightType = highlightType;
         selectedTile.selectedDirection = direction;
     }
-}
+};
 
 Grid.prototype.insertTile = function (tile) {
     this.cells[tile.x][tile.y] = tile;
@@ -82,16 +114,37 @@ Grid.prototype.withinBounds = function (position) {
            position.y >= 0 && position.y < this.size;
 };
 
-Grid.prototype.serialize = function () {
-    var cellState = [];
-    for (var x = 0; x < this.size; x++) {
-        var row = cellState[x] = [];
-        for (var y = 0; y < this.size; y++) {
-            row.push(this.cells[x][y].serialize());
-        }
+Grid.prototype.humanJustWon = function () {
+    if (this.at({x: 0, y: 0}).color == 'blue' || this.at({x: 5, y: 0}).color == 'blue') {
+        return true;
     }
-    return {
-        size: this.size,
-        cells: cellState
-    };
+    if (this.capturedByHuman.filter(function(c){ return c === 'blue'; }).length === 4) {
+        return true;
+    }
+    return false;
 };
+
+Grid.prototype.humanJustLost = function () {
+    if (this.capturedByHuman.filter(function(c){ return c === 'red'; }).length === 4) {
+        return true;
+    }
+    return false;
+};
+
+Grid.prototype.aiJustWon = function () {
+    if (this.at({x: 0, y: 5}).color == 'blue' || this.at({x: 5, y: 5}).color == 'blue') {
+        return true;
+    }
+    if (this.capturedByAI.filter(function(c){ return c === 'blue'; }).length === 4) {
+        return true;
+    }
+    return false;
+};
+
+Grid.prototype.aiJustLost = function () {
+    if (this.capturedByAI.filter(function(c){ return c === 'red'; }).length === 4) {
+        return true;
+    }
+    return false;
+};
+
