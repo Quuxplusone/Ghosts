@@ -7,13 +7,13 @@ AIPlayer.prototype.allValidMoves = function (gameManager) {
         for (var y=0; y < 6; ++y) {
             for (var direction=0; direction < 4; ++direction) {
                 var source = {x: x, y: y};
-                var target = gameManager.addDirection(source, direction);
+                var target = Util.addDirection(source, direction);
                 if (gameManager.isLegalMoveForAI(source, direction)) {
                     moves.push({
                         source: source,
                         direction: direction,
                         target: target,
-                        makesCapture: (gameManager.grid.cellContent(target).owner === 'human'),
+                        makesCapture: (gameManager.grid.at(target).owner === 'human'),
                         advancesSouthward: (direction == 2),
                     });
                 }
@@ -43,7 +43,7 @@ AIPlayer.prototype.mightPreventWin = function (a) {
 
 AIPlayer.prototype.chooseMove = function (gameManager) {
     var moves = this.allValidMoves(gameManager);
-    gameManager.shuffleArray(moves);
+    Util.shuffleArray(moves);
     moves.sort(this.compareMoves);  // stable sort good moves toward the front
     if (this.mightPreventWin(moves[0])) {
         return moves[0];

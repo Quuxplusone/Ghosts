@@ -50,13 +50,12 @@ GameManager.prototype.setup = function () {
         this.isAITurn = previousState.isAITurn;
     } else {
         this.grid = new Grid(this.size);
+        this.grid.addInitialTiles();
         this.lost = false;
         this.won = false;
         this.capturedByHuman = [];
         this.capturedByAI = [];
         this.isAITurn = (Math.round(Math.random()) == 0);
-
-        this.addInitialTiles();
     }
 
     // Input UI states:
@@ -77,43 +76,6 @@ GameManager.prototype.setup = function () {
         }, 500);
     } else {
         this.actuate();
-    }
-};
-
-GameManager.prototype.shuffleArray = function(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-GameManager.prototype.addInitialTiles = function () {
-    var pieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
-    this.shuffleArray(pieces);
-    this.grid.insertTile(new Tile({x: 1, y: 5}, pieces[0], 'human'));
-    this.grid.insertTile(new Tile({x: 2, y: 5}, pieces[1], 'human'));
-    this.grid.insertTile(new Tile({x: 3, y: 5}, pieces[2], 'human'));
-    this.grid.insertTile(new Tile({x: 4, y: 5}, pieces[3], 'human'));
-    this.grid.insertTile(new Tile({x: 1, y: 4}, pieces[4], 'human'));
-    this.grid.insertTile(new Tile({x: 2, y: 4}, pieces[5], 'human'));
-    this.grid.insertTile(new Tile({x: 3, y: 4}, pieces[6], 'human'));
-    this.grid.insertTile(new Tile({x: 4, y: 4}, pieces[7], 'human'));
-    this.shuffleArray(pieces);
-    this.grid.insertTile(new Tile({x: 1, y: 0}, pieces[0], 'ai'));
-    this.grid.insertTile(new Tile({x: 2, y: 0}, pieces[1], 'ai'));
-    this.grid.insertTile(new Tile({x: 3, y: 0}, pieces[2], 'ai'));
-    this.grid.insertTile(new Tile({x: 4, y: 0}, pieces[3], 'ai'));
-    this.grid.insertTile(new Tile({x: 1, y: 1}, pieces[4], 'ai'));
-    this.grid.insertTile(new Tile({x: 2, y: 1}, pieces[5], 'ai'));
-    this.grid.insertTile(new Tile({x: 3, y: 1}, pieces[6], 'ai'));
-    this.grid.insertTile(new Tile({x: 4, y: 1}, pieces[7], 'ai'));
-    for (var x = 0; x < 6; ++x) {
-        for (var y = 0; y < 6; ++y) {
-            if ((1 <= x && x <= 4) && (y <= 1 || y >= 4)) {
-                continue;
-            }
-            this.grid.insertTile(new Tile({x: x, y: y}, null, null));
-        }
     }
 };
 
@@ -146,7 +108,7 @@ GameManager.prototype.arrow = function (direction) {
     // 2: Have indicated the (valid) direction in which to move that ghost.
     // The next step is to confirm the move, which puts us back into state 0.
     if (this.inputState == 0) {
-        var d = this.getVector(direction);
+        var d = Util.getVector(direction);
         this.highlightedTile = {
             x: Math.min(Math.max(0, this.highlightedTile.x + d.x), 5),
             y: Math.min(Math.max(0, this.highlightedTile.y + d.y), 5),
@@ -156,7 +118,7 @@ GameManager.prototype.arrow = function (direction) {
             this.selectedDirection = direction;
             this.inputState = 2;
         } else {
-            var d = this.getVector(direction);
+            var d = Util.getVector(direction);
             this.highlightedTile = {
                 x: Math.min(Math.max(0, this.highlightedTile.x + d.x), 5),
                 y: Math.min(Math.max(0, this.highlightedTile.y + d.y), 5),
@@ -179,7 +141,7 @@ GameManager.prototype.enter = function (dummy) {
     // 2: Have indicated the (valid) direction in which to move that ghost.
     // The next step is to confirm the move, which puts us back into state 0.
     if (this.inputState === 0) {
-        var tile = this.grid.cellContent(this.highlightedTile);
+        var tile = this.grid.at(this.highlightedTile);
         if (tile.owner === 'human') {
             this.inputState = 1;
         }
@@ -195,7 +157,7 @@ GameManager.prototype.click = function (position) {
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     if (this.inputState === 0) {
-        var tile = this.grid.cellContent(position);
+        var tile = this.grid.at(position);
         if (tile.owner === 'human') {
             this.highlightedTile = {x: position.x, y: position.y};
             this.inputState = 1;
@@ -206,20 +168,20 @@ GameManager.prototype.click = function (position) {
     } else if (this.inputState === 1) {
         var hx = this.highlightedTile.x;
         var hy = this.highlightedTile.y;
-        if (this.positionsEqual(position, {x: hx+1, y: hy})) {
+        if (Util.positionsEqual(position, {x: hx+1, y: hy})) {
             this.selectedDirection = 1;
-        } else if (this.positionsEqual(position, {x: hx-1, y: hy})) {
+        } else if (Util.positionsEqual(position, {x: hx-1, y: hy})) {
             this.selectedDirection = 3;
-        } else if (this.positionsEqual(position, {x: hx, y: hy+1})) {
+        } else if (Util.positionsEqual(position, {x: hx, y: hy+1})) {
             this.selectedDirection = 2;
-        } else if (this.positionsEqual(position, {x: hx, y: hy-1})) {
+        } else if (Util.positionsEqual(position, {x: hx, y: hy-1})) {
             this.selectedDirection = 0;
         } else {
             this.selectedDirection = null;
         }
         if (this.isLegalMoveForHuman(this.highlightedTile, this.selectedDirection)) {
             this.inputState = 2;
-        } else if (this.grid.cellContent(position).owner === 'human') {
+        } else if (this.grid.at(position).owner === 'human') {
             this.highlightedTile = position;
             this.selectedDirection = null;
             this.inputState = 1;
@@ -228,10 +190,10 @@ GameManager.prototype.click = function (position) {
             this.inputState = 1;
         }
     } else if (this.inputState === 2) {
-        var target = this.addDirection(this.highlightedTile, this.selectedDirection);
-        if (this.positionsEqual(position, target)) {
+        var target = Util.addDirection(this.highlightedTile, this.selectedDirection);
+        if (Util.positionsEqual(position, target)) {
             this.commitMoveForHuman(this.highlightedTile, this.selectedDirection);
-        } else if (this.grid.cellContent(position).owner === 'human') {
+        } else if (this.grid.at(position).owner === 'human') {
             this.highlightedTile = position;
             this.selectedDirection = null;
             this.inputState = 1;
@@ -262,12 +224,12 @@ GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
     if (!this.grid.withinBounds(source)) {
         return false;
     }
-    var target = this.addDirection(source, direction);
+    var target = Util.addDirection(source, direction);
     if (!this.grid.withinBounds(target)) {
         return false;
     }
-    var sourceTile = this.grid.cellContent(source);
-    var targetTile = this.grid.cellContent(target);
+    var sourceTile = this.grid.at(source);
+    var targetTile = this.grid.at(target);
     if (sourceTile.owner !== 'human' || targetTile.owner === 'human') {
         return false;
     }
@@ -291,12 +253,12 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
     if (!this.grid.withinBounds(source)) {
         return false;
     }
-    var target = this.addDirection(source, direction);
+    var target = Util.addDirection(source, direction);
     if (!this.grid.withinBounds(target)) {
         return false;
     }
-    var sourceTile = this.grid.cellContent(source);
-    var targetTile = this.grid.cellContent(target);
+    var sourceTile = this.grid.at(source);
+    var targetTile = this.grid.at(target);
     if (sourceTile.owner !== 'ai' || targetTile.owner === 'ai') {
         return false;
     }
@@ -313,11 +275,11 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
 GameManager.prototype.commitMoveForHuman = function (source, direction) {
     // 0: up, 1: right, 2: down, 3: left
 
-    var target = this.addDirection(source, direction);
+    var target = Util.addDirection(source, direction);
     console.assert(this.grid.withinBounds(source));
     console.assert(this.grid.withinBounds(target));
-    var sourceTile = this.grid.cellContent(source);
-    var targetTile = this.grid.cellContent(target);
+    var sourceTile = this.grid.at(source);
+    var targetTile = this.grid.at(target);
     console.assert(sourceTile.owner === 'human');
     console.assert(targetTile.owner !== 'human');
     if (targetTile.owner === 'ai') {
@@ -351,9 +313,9 @@ GameManager.prototype.commitMoveForHuman = function (source, direction) {
 };
 
 GameManager.prototype.commitMoveForAI = function (source, direction) {
-    var target = this.addDirection(source, direction);
-    var sourceTile = this.grid.cellContent(source);
-    var targetTile = this.grid.cellContent(target);
+    var target = Util.addDirection(source, direction);
+    var sourceTile = this.grid.at(source);
+    var targetTile = this.grid.at(target);
     console.assert(sourceTile.owner === 'ai');
     console.assert(targetTile.owner !== 'ai');
     if (targetTile.owner === 'human') {
@@ -376,27 +338,4 @@ GameManager.prototype.commitMoveForAI = function (source, direction) {
     this.isAITurn = false;
 };
 
-// Get the vector representing the chosen direction
-GameManager.prototype.getVector = function (direction) {
-  // Vectors representing tile movement
-  var map = {
-    0: { x: 0,  y: -1 }, // Up
-    1: { x: 1,  y: 0 },  // Right
-    2: { x: 0,  y: 1 },  // Down
-    3: { x: -1, y: 0 }   // Left
-  };
 
-  return map[direction];
-};
-
-GameManager.prototype.addDirection = function (source, direction) {
-    var d = this.getVector(direction);
-    return {
-        x: source.x + d.x,
-        y: source.y + d.y,
-    };
-};
-
-GameManager.prototype.positionsEqual = function (first, second) {
-  return first.x === second.x && first.y === second.y;
-};
