@@ -430,37 +430,6 @@ hr {
   }
 }
 
-@include keyframes(appear) {
-  0% {
-    opacity: 0;
-    @include transform(scale(0));
-  }
-
-  100% {
-    opacity: 1;
-    @include transform(scale(1));
-  }
-}
-
-.tile-new .tile-inner {
-  @include animation(appear 200ms ease $transition-speed);
-  @include animation-fill-mode(backwards);
-}
-
-@include keyframes(pop) {
-  0% {
-    @include transform(scale(0));
-  }
-
-  50% {
-    @include transform(scale(1.2));
-  }
-
-  100% {
-    @include transform(scale(1));
-  }
-}
-
 .above-game {
   @include clearfix;
 }
