@@ -28,3 +28,18 @@ Util.addDirection = function (source, direction) {
 Util.positionsEqual = function (first, second) {
     return first.x === second.x && first.y === second.y;
 };
+
+Util.isWithinBounds = function (position) {
+    return 0 <= position.x && position.x <= 5 &&
+           0 <= position.y && position.y <= 5;
+};
+
+Util.isHumanStartPosition = function (position) {
+    return 1 <= position.x && position.x <= 4 &&
+           4 <= position.y && position.y <= 5;
+};
+
+Util.isAIStartPosition = function (position) {
+    return 1 <= position.x && position.x <= 4 &&
+           0 <= position.y && position.y <= 1;
+};

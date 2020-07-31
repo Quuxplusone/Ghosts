@@ -144,8 +144,6 @@ GameManager.prototype.enter = function (dummy) {
 };
 
 GameManager.prototype.click = function (position) {
-    console.log(this);
-
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     if (this.inputState === 0) {
@@ -213,11 +211,11 @@ GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
     if (source === null || direction === null) {
         return false;
     }
-    if (!this.grid.withinBounds(source)) {
+    if (!Util.isWithinBounds(source)) {
         return false;
     }
     var target = Util.addDirection(source, direction);
-    if (!this.grid.withinBounds(target)) {
+    if (!Util.isWithinBounds(target)) {
         return false;
     }
     var sourceTile = this.grid.at(source);
@@ -242,11 +240,11 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
     if (source === null || direction === null) {
         return false;
     }
-    if (!this.grid.withinBounds(source)) {
+    if (!Util.isWithinBounds(source)) {
         return false;
     }
     var target = Util.addDirection(source, direction);
-    if (!this.grid.withinBounds(target)) {
+    if (!Util.isWithinBounds(target)) {
         return false;
     }
     var sourceTile = this.grid.at(source);
@@ -268,8 +266,8 @@ GameManager.prototype.commitMoveForHuman = function (source, direction) {
     // 0: up, 1: right, 2: down, 3: left
 
     var target = Util.addDirection(source, direction);
-    console.assert(this.grid.withinBounds(source));
-    console.assert(this.grid.withinBounds(target));
+    console.assert(Util.isWithinBounds(source));
+    console.assert(Util.isWithinBounds(target));
     var sourceTile = this.grid.at(source);
     var targetTile = this.grid.at(target);
     console.assert(sourceTile.owner === 'human');

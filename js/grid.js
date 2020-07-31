@@ -4,38 +4,25 @@ function Grid() {
 
 Grid.newGame = function () {
     var self = new Grid();
-    self.cells = self.cellsFromState(null);
     self.capturedByHuman = [];
     self.capturedByAI = [];
-    self.isAITurn = false;
-    self.addInitialTiles();
     self.isAITurn = (Math.round(Math.random()) == 0);
+    self.cells = self.cellsFromState(null);
 
-    var pieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
-    Util.shuffleArray(pieces);
-    this.insertTile(new Tile({x: 1, y: 5}, pieces[0], 'human'));
-    this.insertTile(new Tile({x: 2, y: 5}, pieces[1], 'human'));
-    this.insertTile(new Tile({x: 3, y: 5}, pieces[2], 'human'));
-    this.insertTile(new Tile({x: 4, y: 5}, pieces[3], 'human'));
-    this.insertTile(new Tile({x: 1, y: 4}, pieces[4], 'human'));
-    this.insertTile(new Tile({x: 2, y: 4}, pieces[5], 'human'));
-    this.insertTile(new Tile({x: 3, y: 4}, pieces[6], 'human'));
-    this.insertTile(new Tile({x: 4, y: 4}, pieces[7], 'human'));
-    Util.shuffleArray(pieces);
-    this.insertTile(new Tile({x: 1, y: 0}, pieces[0], 'ai'));
-    this.insertTile(new Tile({x: 2, y: 0}, pieces[1], 'ai'));
-    this.insertTile(new Tile({x: 3, y: 0}, pieces[2], 'ai'));
-    this.insertTile(new Tile({x: 4, y: 0}, pieces[3], 'ai'));
-    this.insertTile(new Tile({x: 1, y: 1}, pieces[4], 'ai'));
-    this.insertTile(new Tile({x: 2, y: 1}, pieces[5], 'ai'));
-    this.insertTile(new Tile({x: 3, y: 1}, pieces[6], 'ai'));
-    this.insertTile(new Tile({x: 4, y: 1}, pieces[7], 'ai'));
+    var humanPieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
+    var aiPieces = ['blue', 'blue', 'blue', 'blue', 'red', 'red', 'red', 'red'];
+    Util.shuffleArray(humanPieces);
+    Util.shuffleArray(aiPieces);
     for (var x = 0; x < 6; ++x) {
         for (var y = 0; y < 6; ++y) {
-            if ((1 <= x && x <= 4) && (y <= 1 || y >= 4)) {
-                continue;
+            var position = {x: x, y: y};
+            if (Util.isHumanStartPosition(position)) {
+                self.cells[x][y] = new Tile(position, humanPieces.pop(), 'human');
+            } else if (Util.isAIStartPosition(position)) {
+                self.cells[x][y] = new Tile(position, aiPieces.pop(), 'ai');
+            } else {
+                self.cells[x][y] = new Tile(position, null, null);
             }
-            this.insertTile(new Tile({x: x, y: y}, null, null));
         }
     }
     return self;
@@ -43,10 +30,10 @@ Grid.newGame = function () {
 
 Grid.fromPreviousState = function (previousState) {
     var self = new Grid();
-    self.cells = self.cellsFromState(previousState.cells);
     self.capturedByHuman = previousState.capturedByHuman;
     self.capturedByAI = previousState.capturedByAI;
     self.isAITurn = previousState.isAITurn;
+    self.cells = self.cellsFromState(previousState.cells);
     return self;
 };
 
@@ -84,12 +71,12 @@ Grid.prototype.serialize = function () {
 };
 
 Grid.prototype.at = function (cell) {
-    console.assert(this.withinBounds(cell));
+    console.assert(Util.isWithinBounds(cell));
     return this.cells[cell.x][cell.y];
 };
 
 Grid.prototype.highlightTile = function (highlightType, position, direction) {
-    console.assert(this.withinBounds(position));
+    console.assert(Util.isWithinBounds(position));
     for (var x = 0; x < this.size; ++x) {
         for (var y = 0; y < this.size; ++y) {
             this.cells[x][y].highlightType = null;
@@ -101,15 +88,6 @@ Grid.prototype.highlightTile = function (highlightType, position, direction) {
         selectedTile.highlightType = highlightType;
         selectedTile.selectedDirection = direction;
     }
-};
-
-Grid.prototype.insertTile = function (tile) {
-    this.cells[tile.x][tile.y] = tile;
-};
-
-Grid.prototype.withinBounds = function (position) {
-    return position.x >= 0 && position.x < this.size &&
-           position.y >= 0 && position.y < this.size;
 };
 
 Grid.prototype.humanJustWon = function () {
