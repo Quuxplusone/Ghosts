@@ -75,99 +75,74 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
-  this.bindButtonPress(".grid-position-1-1", function (event) { this.emit("click", {x: 0, y: 0}); });
-  this.bindButtonPress(".grid-position-1-2", function (event) { this.emit("click", {x: 0, y: 1}); });
-  this.bindButtonPress(".grid-position-1-3", function (event) { this.emit("click", {x: 0, y: 2}); });
-  this.bindButtonPress(".grid-position-1-4", function (event) { this.emit("click", {x: 0, y: 3}); });
-  this.bindButtonPress(".grid-position-1-5", function (event) { this.emit("click", {x: 0, y: 4}); });
-  this.bindButtonPress(".grid-position-1-6", function (event) { this.emit("click", {x: 0, y: 5}); });
-  this.bindButtonPress(".grid-position-2-1", function (event) { this.emit("click", {x: 1, y: 0}); });
-  this.bindButtonPress(".grid-position-2-2", function (event) { this.emit("click", {x: 1, y: 1}); });
-  this.bindButtonPress(".grid-position-2-3", function (event) { this.emit("click", {x: 1, y: 2}); });
-  this.bindButtonPress(".grid-position-2-4", function (event) { this.emit("click", {x: 1, y: 3}); });
-  this.bindButtonPress(".grid-position-2-5", function (event) { this.emit("click", {x: 1, y: 4}); });
-  this.bindButtonPress(".grid-position-2-6", function (event) { this.emit("click", {x: 1, y: 5}); });
-  this.bindButtonPress(".grid-position-3-1", function (event) { this.emit("click", {x: 2, y: 0}); });
-  this.bindButtonPress(".grid-position-3-2", function (event) { this.emit("click", {x: 2, y: 1}); });
-  this.bindButtonPress(".grid-position-3-3", function (event) { this.emit("click", {x: 2, y: 2}); });
-  this.bindButtonPress(".grid-position-3-4", function (event) { this.emit("click", {x: 2, y: 3}); });
-  this.bindButtonPress(".grid-position-3-5", function (event) { this.emit("click", {x: 2, y: 4}); });
-  this.bindButtonPress(".grid-position-3-6", function (event) { this.emit("click", {x: 2, y: 5}); });
-  this.bindButtonPress(".grid-position-4-1", function (event) { this.emit("click", {x: 3, y: 0}); });
-  this.bindButtonPress(".grid-position-4-2", function (event) { this.emit("click", {x: 3, y: 1}); });
-  this.bindButtonPress(".grid-position-4-3", function (event) { this.emit("click", {x: 3, y: 2}); });
-  this.bindButtonPress(".grid-position-4-4", function (event) { this.emit("click", {x: 3, y: 3}); });
-  this.bindButtonPress(".grid-position-4-5", function (event) { this.emit("click", {x: 3, y: 4}); });
-  this.bindButtonPress(".grid-position-4-6", function (event) { this.emit("click", {x: 3, y: 5}); });
-  this.bindButtonPress(".grid-position-5-1", function (event) { this.emit("click", {x: 4, y: 0}); });
-  this.bindButtonPress(".grid-position-5-2", function (event) { this.emit("click", {x: 4, y: 1}); });
-  this.bindButtonPress(".grid-position-5-3", function (event) { this.emit("click", {x: 4, y: 2}); });
-  this.bindButtonPress(".grid-position-5-4", function (event) { this.emit("click", {x: 4, y: 3}); });
-  this.bindButtonPress(".grid-position-5-5", function (event) { this.emit("click", {x: 4, y: 4}); });
-  this.bindButtonPress(".grid-position-5-6", function (event) { this.emit("click", {x: 4, y: 5}); });
-  this.bindButtonPress(".grid-position-6-1", function (event) { this.emit("click", {x: 5, y: 0}); });
-  this.bindButtonPress(".grid-position-6-2", function (event) { this.emit("click", {x: 5, y: 1}); });
-  this.bindButtonPress(".grid-position-6-3", function (event) { this.emit("click", {x: 5, y: 2}); });
-  this.bindButtonPress(".grid-position-6-4", function (event) { this.emit("click", {x: 5, y: 3}); });
-  this.bindButtonPress(".grid-position-6-5", function (event) { this.emit("click", {x: 5, y: 4}); });
-  this.bindButtonPress(".grid-position-6-6", function (event) { this.emit("click", {x: 5, y: 5}); });
+  self.touchStartPosition = {x: -1, y: -1};
+  for (var x=0; x < 6; ++x) {
+      for (var y=0; y < 6; ++y) {
+          let position = {x: x, y: y};
+          let button = document.querySelector(`.grid-position-${x+1}-${y+1}`);
+          console.assert(button);
+          button.x = position.x;
+          button.y = position.y;
+
+          var dispatch = function (source, target) {
+              if (Util.positionsEqual(target, source)) {
+                  self.emit("click", target);
+              } else if (Util.positionsEqual(target, Util.addDirection(source, 0))) {
+                  self.emit("swipe", {source: source, direction: 0});
+              } else if (Util.positionsEqual(target, Util.addDirection(source, 1))) {
+                  self.emit("swipe", {source: source, direction: 1});
+              } else if (Util.positionsEqual(target, Util.addDirection(source, 2))) {
+                  self.emit("swipe", {source: source, direction: 2});
+              } else if (Util.positionsEqual(target, Util.addDirection(source, 3))) {
+                  self.emit("swipe", {source: source, direction: 3});
+              }
+          };
+
+          button.addEventListener(this.eventTouchstart, function (event) {
+              console.log("ok, touchstart", position);
+              if (event.touches.length >= 2) {
+                  self.touchStartPosition = {x: -1, y: -1};
+                  return;  // Ignore multitouch.
+              }
+              self.touchStartPosition = position;
+          });
+          button.addEventListener(this.eventTouchend, function (event) {
+              console.log("ok, touchend", position);
+              if (event.touches.length >= 1 || event.changedTouches.length != 1) {
+                  self.touchStartPosition = {x: -1, y: -1};
+                  return;  // Ignore if the touch is still going on.
+              }
+              var changedTouch = event.changedTouches[0];
+              console.log("changedTouch.clientXY is", changedTouch.clientX, changedTouch.clientY);
+              console.log("changedTouch.element/target is", changedTouch.element, changedTouch.target);
+              var element = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+              console.log("element is", element);
+              var position = {x: element.x, y: element.y};
+              console.log("position is", position);
+              var source = self.touchStartPosition;
+              self.touchStartPosition = {x: -1, y: -1};
+              dispatch(source, position);
+
+              // The browser might generate a "click" event for this, if we let it. Don't let it.
+              event.preventDefault();
+          });
+
+          button.addEventListener("mousedown", function (event) {
+              console.log("ok, mousedown", position);
+              self.touchStartPosition = position;
+          });
+          button.addEventListener("mouseup", function (event) {
+              console.log("ok, mouseup", position);
+              var source = self.touchStartPosition;
+              self.touchStartPosition = {x: -1, y: -1};
+              dispatch(source, position);
+          });
+      }
+  }
 
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
-
-  // Respond to swipe events
-  var touchStartClientX, touchStartClientY;
-  var gameContainer = document.getElementsByClassName("game-container")[0];
-
-  gameContainer.addEventListener(this.eventTouchstart, function (event) {
-    if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
-        event.targetTouches.length > 1 ||
-        self.targetIsInput(event)) {
-      return; // Ignore if touching with more than 1 finger or touching input
-    }
-
-    if (window.navigator.msPointerEnabled) {
-      touchStartClientX = event.pageX;
-      touchStartClientY = event.pageY;
-    } else {
-      touchStartClientX = event.touches[0].clientX;
-      touchStartClientY = event.touches[0].clientY;
-    }
-  });
-
-  gameContainer.addEventListener(this.eventTouchmove, function (event) {
-  });
-
-  gameContainer.addEventListener(this.eventTouchend, function (event) {
-    if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
-        event.targetTouches.length > 0 ||
-        self.targetIsInput(event)) {
-      return; // Ignore if still touching with one or more fingers or input
-    }
-
-    var touchEndClientX, touchEndClientY;
-
-    if (window.navigator.msPointerEnabled) {
-      touchEndClientX = event.pageX;
-      touchEndClientY = event.pageY;
-    } else {
-      touchEndClientX = event.changedTouches[0].clientX;
-      touchEndClientY = event.changedTouches[0].clientY;
-    }
-
-    var dx = touchEndClientX - touchStartClientX;
-    var absDx = Math.abs(dx);
-
-    var dy = touchEndClientY - touchStartClientY;
-    var absDy = Math.abs(dy);
-
-    if (Math.max(absDx, absDy) > 10) {
-      // (right : left) : (down : up)
-      self.emit("arrow", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
-      event.preventDefault();
-    }
-  });
 };
 
 KeyboardInputManager.prototype.restart = function (event) {

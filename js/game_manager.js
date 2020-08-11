@@ -196,9 +196,19 @@ GameManager.prototype.click = function (position) {
 };
 
 GameManager.prototype.swipe = function (position_and_direction) {
-    console.log("ok, swipe", this, position_and_direction);
+    console.log("ok, swipe", position_and_direction);
 
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
+
+    var source = position_and_direction.source;
+    var direction = position_and_direction.direction;
+    console.assert(Util.isWithinBounds(source));
+
+    if (this.isLegalMoveForHuman(source, direction)) {
+        this.commitMoveForHuman(source, direction);
+    } else {
+        this.highlightedTile = source;
+    }
 
     this.actuate();
 };
