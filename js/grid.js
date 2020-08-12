@@ -90,37 +90,34 @@ Grid.prototype.highlightTile = function (highlightType, position, direction) {
     }
 };
 
+Grid.prototype.humanPiecesRemaining = function (color) {
+    return 4 - this.capturedByAI.filter(function(c){ return c === color; }).length;
+};
+
+Grid.prototype.aiPiecesRemaining = function (color) {
+    return 4 - this.capturedByHuman.filter(function(c){ return c === color; }).length;
+};
+
 Grid.prototype.humanJustWon = function () {
-    if (this.at({x: 0, y: 0}).color == 'blue' || this.at({x: 5, y: 0}).color == 'blue') {
-        return true;
-    }
-    if (this.capturedByHuman.filter(function(c){ return c === 'blue'; }).length === 4) {
-        return true;
-    }
-    return false;
+    return (
+        this.at({x: 0, y: 0}).color == 'blue' ||
+        this.at({x: 5, y: 0}).color == 'blue' ||
+        this.aiPiecesRemaining('blue') == 0
+    );
 };
 
 Grid.prototype.humanJustLost = function () {
-    if (this.capturedByHuman.filter(function(c){ return c === 'red'; }).length === 4) {
-        return true;
-    }
-    return false;
+    return (this.aiPiecesRemaining('red') == 0);
 };
 
 Grid.prototype.aiJustWon = function () {
-    if (this.at({x: 0, y: 5}).color == 'blue' || this.at({x: 5, y: 5}).color == 'blue') {
-        return true;
-    }
-    if (this.capturedByAI.filter(function(c){ return c === 'blue'; }).length === 4) {
-        return true;
-    }
-    return false;
+    return (
+        this.at({x: 0, y: 5}).color == 'blue' ||
+        this.at({x: 5, y: 5}).color == 'blue' ||
+        this.humanPiecesRemaining('blue') == 0
+    );
 };
 
 Grid.prototype.aiJustLost = function () {
-    if (this.capturedByAI.filter(function(c){ return c === 'red'; }).length === 4) {
-        return true;
-    }
-    return false;
+    return (this.humanPiecesRemaining('red') == 0);
 };
-
