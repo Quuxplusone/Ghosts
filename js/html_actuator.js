@@ -1,31 +1,53 @@
 function HTMLActuator() {
-    this.tileContainer    = document.querySelector(".tile-container");
+    this.tileContainer = document.querySelector(".tile-container");
     this.messageContainer = document.querySelector(".game-message");
+    this.capturedByAIContainer = document.querySelector(".captured-by-ai-container");
+    this.capturedByHumanContainer = document.querySelector(".captured-by-human-container");
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
-  var self = this;
+    var self = this;
 
-  window.requestAnimationFrame(function () {
-    self.clearContainer(self.tileContainer);
+    window.requestAnimationFrame(function () {
+        self.clearContainer(self.tileContainer);
+        self.clearContainer(self.capturedByHumanContainer);
+        self.clearContainer(self.capturedByAIContainer);
 
-    grid.cells.forEach(function (column) {
-      column.forEach(function (cell) {
-        if (cell) {
-          self.addTile(cell);
+        grid.cells.forEach(function (column) {
+            column.forEach(function (cell) {
+                console.assert(cell);
+                self.addTile(cell);
+            });
+        });
+
+        for (var i=0; i < 7; ++i) {
+            let piece = document.createElement("div");
+            piece.classList.add("captured-piece");
+            if (i < grid.capturedByAI.length) {
+                piece.classList.add(`${grid.capturedByAI[i]}-ghost`);
+            } else {
+                piece.classList.add("no-ghost");
+            }
+            self.capturedByAIContainer.appendChild(piece);
         }
-      });
+
+        for (var i=6; i >= 0; --i) {
+            let piece = document.createElement("div");
+            piece.classList.add("captured-piece");
+            if (i < grid.capturedByHuman.length) {
+                piece.classList.add(`${grid.capturedByHuman[i]}-ghost`);
+            } else {
+                piece.classList.add("no-ghost");
+            }
+            self.capturedByHumanContainer.appendChild(piece);
+        }
+
+        if (metadata.lost) {
+            self.message(false); // You lose
+        } else if (metadata.won) {
+            self.message(true); // You win!
+        }
     });
-
-    if (metadata.terminated) {
-      if (metadata.lost) {
-        self.message(false); // You lose
-      } else if (metadata.won) {
-        self.message(true); // You win!
-      }
-    }
-
-  });
 };
 
 HTMLActuator.prototype.clearContainer = function (container) {

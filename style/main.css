@@ -279,9 +279,40 @@ hr {
   margin-top: 25%;
 }
 
+.captured-piece {
+  display: block;
+  width: 35.8333333333px;
+  height: 35.8333333333px;
+}
+.captured-piece.blue-ghost {
+  background-image: radial-gradient(circle at center, blue 0%, blue 10%, transparent 20%), url(friendly-ghost.png);
+  background-size: contain;
+}
+.captured-piece.red-ghost {
+  background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
+  background-size: contain;
+}
 .grid-container {
   position: absolute;
   z-index: 1;
+}
+.grid-container .captured-by-ai-container {
+  position: absolute;
+  width: 35.8333333333px;
+  height: 250.8333333333px;
+  -webkit-transform: translate(-55.8333333333px, 0);
+  -moz-transform: translate(-55.8333333333px, 0);
+  -ms-transform: translate(-55.8333333333px, 0);
+  transform: translate(-55.8333333333px, 0);
+}
+.grid-container .captured-by-human-container {
+  position: absolute;
+  width: 35.8333333333px;
+  height: 250.8333333333px;
+  -webkit-transform: translate(500px, 229.1666666667px);
+  -moz-transform: translate(500px, 229.1666666667px);
+  -ms-transform: translate(500px, 229.1666666667px);
+  transform: translate(500px, 229.1666666667px);
 }
 
 .grid-row {
@@ -794,9 +825,40 @@ hr {
     margin-top: 25%;
   }
 
+  .captured-piece {
+    display: block;
+    width: 19.8333333333px;
+    height: 19.8333333333px;
+  }
+  .captured-piece.blue-ghost {
+    background-image: radial-gradient(circle at center, blue 0%, blue 10%, transparent 20%), url(friendly-ghost.png);
+    background-size: contain;
+  }
+  .captured-piece.red-ghost {
+    background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
+    background-size: contain;
+  }
   .grid-container {
     position: absolute;
     z-index: 1;
+  }
+  .grid-container .captured-by-ai-container {
+    position: absolute;
+    width: 19.8333333333px;
+    height: 138.8333333333px;
+    -webkit-transform: translate(-31.8333333333px, 0);
+    -moz-transform: translate(-31.8333333333px, 0);
+    -ms-transform: translate(-31.8333333333px, 0);
+    transform: translate(-31.8333333333px, 0);
+  }
+  .grid-container .captured-by-human-container {
+    position: absolute;
+    width: 19.8333333333px;
+    height: 138.8333333333px;
+    -webkit-transform: translate(280px, 129.1666666667px);
+    -moz-transform: translate(280px, 129.1666666667px);
+    -ms-transform: translate(280px, 129.1666666667px);
+    transform: translate(280px, 129.1666666667px);
   }
 
   .grid-row {

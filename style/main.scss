@@ -292,7 +292,37 @@ hr {
     }
   }
 
+  .captured-piece {
+    display: block;
+    width: ($tile-size / 2);
+    height: ($tile-size / 2);
+
+    &.blue-ghost {
+      background-image: radial-gradient(circle at center, blue 0%, blue 10%, transparent 20%), url(friendly-ghost.png);
+      background-size: contain;
+    }
+    &.red-ghost {
+      background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
+      background-size: contain;
+    }
+    &.no-ghost {
+    }
+  }
+
   .grid-container {
+    .captured-by-ai-container {
+      position: absolute;
+      width: ($tile-size / 2);
+      height: ($tile-size / 2) * 7;
+      @include transform(translate(-1 * (2 * $grid-spacing + $tile-size / 2), 0));
+    }
+    .captured-by-human-container {
+      position: absolute;
+      width: ($tile-size / 2);
+      height: ($tile-size / 2) * 7;
+      @include transform(translate(($field-width), $field-width - (($tile-size / 2) * 7) - (2 * $grid-spacing)));
+    }
+
     position: absolute;
     z-index: 1;
   }

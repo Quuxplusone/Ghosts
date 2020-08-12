@@ -85,7 +85,6 @@ GameManager.prototype.actuate = function () {
     this.actuator.actuate(this.grid, {
         lost:       this.lost,
         won:        this.won,
-        terminated: this.isGameTerminated(),
     });
 };
 
