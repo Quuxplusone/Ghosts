@@ -27,12 +27,12 @@ GameManager.prototype.isGameTerminated = function () {
 };
 
 GameManager.prototype.serialize = function () {
-  return {
-    grid: this.grid.serialize(),
-    aiPlayer: this.aiPlayer.serialize(),
-    lost: this.lost,
-    won: this.won,
-  };
+    return {
+        grid: this.grid.serialize(),
+        aiPlayer: this.aiPlayer.serialize(),
+        lost: this.lost,
+        won: this.won,
+    };
 };
 
 GameManager.prototype.setup = function () {

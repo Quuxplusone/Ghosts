@@ -1,11 +1,11 @@
 function Tile(position, color, owner) {
-  this.x                = position.x;
-  this.y                = position.y;
-  this.previousPosition = null;
-  this.color            = color;  // 'blue' or 'red' or null
-  this.owner            = owner;  // 'human' or 'ai' or null
-  this.isHighlighted = false;
-  this.selectedDirection = null;
+    this.x = position.x;
+    this.y = position.y;
+    this.previousPosition = null;
+    this.color = color;  // 'blue' or 'red' or null
+    this.owner = owner;  // 'human' or 'ai' or null
+    this.isHighlighted = false;
+    this.selectedDirection = null;
 }
 
 Tile.prototype.isExitForHuman = function () {
@@ -17,17 +17,17 @@ Tile.prototype.isExitForAI = function () {
 };
 
 Tile.prototype.updatePosition = function (position) {
-  this.x = position.x;
-  this.y = position.y;
+    this.x = position.x;
+    this.y = position.y;
 };
 
 Tile.prototype.serialize = function () {
-  return {
-    position: {
-      x: this.x,
-      y: this.y
-    },
-    color: this.color,
-    owner: this.owner,
-  };
+    return {
+        position: {
+            x: this.x,
+            y: this.y,
+        },
+        color: this.color,
+        owner: this.owner,
+    };
 };

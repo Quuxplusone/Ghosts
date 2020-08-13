@@ -43,9 +43,11 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
         }
 
         if (metadata.lost) {
-            self.message(false); // You lose
+            self.messageContainer.classList.add("game-lost");
+            self.messageContainer.getElementsByTagName("p")[0].textContent = "You lose!";
         } else if (metadata.won) {
-            self.message(true); // You win!
+            self.messageContainer.classList.add("game-won");
+            self.messageContainer.getElementsByTagName("p")[0].textContent = "You win!";
         }
     });
 };
@@ -57,47 +59,47 @@ HTMLActuator.prototype.clearContainer = function (container) {
 };
 
 HTMLActuator.prototype.addTile = function (tile) {
-  var self = this;
+    var self = this;
 
-  var wrapper   = document.createElement("div");
-  var inner     = document.createElement("div");
-  var position  = { x: tile.x, y: tile.y };
-  var positionClass = this.positionClass(tile.previousPosition ? tile.previousPosition : position);
+    var wrapper   = document.createElement("div");
+    var inner     = document.createElement("div");
+    var position  = { x: tile.x, y: tile.y };
+    var positionClass = this.positionClass(tile.previousPosition ? tile.previousPosition : position);
 
-  var appearanceClasses = [ this.valueClass(tile) ];
+    var appearanceClasses = [ this.valueClass(tile) ];
 
-  if (tile.highlightType !== null) {
-    appearanceClasses.push("tile-highlighted-" + tile.highlightType);
-    if (tile.selectedDirection !== null) {
-        appearanceClasses.push("tile-bounce-" + tile.selectedDirection);
+    if (tile.highlightType !== null) {
+        appearanceClasses.push("tile-highlighted-" + tile.highlightType);
+        if (tile.selectedDirection !== null) {
+            appearanceClasses.push("tile-bounce-" + tile.selectedDirection);
+        }
     }
-  }
 
-  // We can't use classlist because it somehow glitches when replacing classes
-  var classes = ["tile", positionClass].concat(appearanceClasses);
+    // We can't use classlist because it somehow glitches when replacing classes
+    var classes = ["tile", positionClass].concat(appearanceClasses);
 
-  inner.classList.add("tile-inner");
+    inner.classList.add("tile-inner");
 
-  if (tile.previousPosition !== null) {
-    // Make sure that the tile gets rendered in the previous position first
-    tile.previousPosition = null;
-    this.applyClasses(wrapper, classes);
-    window.requestAnimationFrame(function () {
-      self.applyClasses(wrapper, classes);
-      window.requestAnimationFrame(function () {
-        classes[1] = self.positionClass({ x: tile.x, y: tile.y });
-        self.applyClasses(wrapper, classes); // Update the position
-      });
-    });
-  } else {
-    this.applyClasses(wrapper, classes);
-  }
+    if (tile.previousPosition !== null) {
+        // Make sure that the tile gets rendered in the previous position first
+        tile.previousPosition = null;
+        this.applyClasses(wrapper, classes);
+        window.requestAnimationFrame(function () {
+            self.applyClasses(wrapper, classes);
+            window.requestAnimationFrame(function () {
+                classes[1] = self.positionClass({ x: tile.x, y: tile.y });
+                self.applyClasses(wrapper, classes); // Update the position
+            });
+        });
+    } else {
+        this.applyClasses(wrapper, classes);
+    }
 
-  // Add the inner part of the tile to the wrapper
-  wrapper.appendChild(inner);
+    // Add the inner part of the tile to the wrapper
+    wrapper.appendChild(inner);
 
-  // Put the tile on the board
-  this.tileContainer.appendChild(wrapper);
+    // Put the tile on the board
+    this.tileContainer.appendChild(wrapper);
 };
 
 HTMLActuator.prototype.applyClasses = function (element, classes) {
@@ -123,14 +125,6 @@ HTMLActuator.prototype.valueClass = function (tile) {
     } else {
         return "blue-ghost";
     }
-};
-
-HTMLActuator.prototype.message = function (won) {
-    var type    = won ? "game-won" : "game-lost";
-    var message = won ? "You win!" : "You lose!";
-
-    this.messageContainer.classList.add(type);
-    this.messageContainer.getElementsByTagName("p")[0].textContent = message;
 };
 
 HTMLActuator.prototype.clearMessage = function () {
