@@ -89,6 +89,27 @@ AIPlayer.prototype.allValidMovesForAI = function (gameManager) {
     return moves;
 };
 
+AIPlayer.prototype.positionDependentBlueness = function () {
+    var result = [
+        [0.0,5.4,1.4,0.4,0.4,0.4],
+        [5.2,1.4,1.0,0.1,0.1,0.1],
+        [5.0,1.0,0.0,0.0,0.0,0.0],
+        [5.0,1.0,0.0,0.0,0.0,0.0],
+        [5.2,1.4,1.0,0.1,0.1,0.1],
+        [0.0,5.4,1.4,0.4,0.4,0.4],
+    ];
+    for (var x=0; x < 6; ++x) {
+        for (var y=0; y < 6; ++y) {
+            if (this.estimatedBlueness[x][y] === null) {
+                result[x][y] = null;
+            } else {
+                result[x][y] += this.estimatedBlueness[x][y];
+            }
+        }
+    }
+    return result;
+};
+
 AIPlayer.prototype.distanceToAIGoal = function (position) {
     if (position.x <= 2) {
         return (5 - position.y) + position.x;
@@ -128,10 +149,10 @@ AIPlayer.prototype.moveProtectsMyBlue = function (m, grid) {
     return false;
 };
 
-AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid) {
-    var eb = this.estimatedBlueness[m.target.x][m.target.y];
+AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid, blueness) {
+    var eb = blueness[m.target.x][m.target.y];
     if (eb !== null) {
-        var estimates = this.estimatedBlueness.flat().filter(e => (e !== null));
+        var estimates = blueness.flat().filter(e => (e !== null));
         estimates.sort();
         var bluesLeft = grid.humanPiecesRemaining('blue');
         var redsLeft = grid.humanPiecesRemaining('red');
@@ -175,6 +196,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     var self = this;
     var moves = this.allValidMovesForAI(gameManager);
     var grid = gameManager.grid;
+    var blueness = this.positionDependentBlueness();
 
     Util.shuffleArray(moves);
 
@@ -193,9 +215,9 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     }
 
     // Capture an estimated blue piece.
-    var capturingMoves = moves.filter(m => (self.moveCapturesEstimatedBluePiece(m, grid) !== null));
+    var capturingMoves = moves.filter(m => (self.moveCapturesEstimatedBluePiece(m, grid, blueness) !== null));
     if (capturingMoves.length >= 1) {
-        return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid));
+        return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid, blueness));
     }
 
     if (grid.capturedByHuman.length <= 4) {
