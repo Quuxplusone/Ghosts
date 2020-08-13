@@ -70,9 +70,19 @@ Grid.prototype.serialize = function () {
     };
 };
 
-Grid.prototype.at = function (cell) {
-    console.assert(Util.isWithinBounds(cell));
-    return this.cells[cell.x][cell.y];
+Grid.prototype.at = function (position) {
+    console.assert(Util.isWithinBounds(position));
+    return this.cells[position.x][position.y];
+};
+
+Grid.prototype.adjacentAIPieces = function (position) {
+    console.assert(Util.isWithinBounds(position));
+    var count = 0;
+    count += (position.x > 0 && this.cells[position.x-1][position.y].owner == 'ai');
+    count += (position.x < 5 && this.cells[position.x+1][position.y].owner == 'ai');
+    count += (position.y > 0 && this.cells[position.x][position.y-1].owner == 'ai');
+    count += (position.y < 5 && this.cells[position.x][position.y+1].owner == 'ai');
+    return count;
 };
 
 Grid.prototype.highlightTile = function (highlightType, position, direction) {

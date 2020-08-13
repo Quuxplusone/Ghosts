@@ -99,7 +99,6 @@ KeyboardInputManager.prototype.listen = function () {
           };
 
           button.addEventListener(this.eventTouchstart, function (event) {
-              console.log("ok, touchstart", position);
               if (event.touches.length >= 2) {
                   self.touchStartPosition = {x: -1, y: -1};
                   return;  // Ignore multitouch.
@@ -107,7 +106,6 @@ KeyboardInputManager.prototype.listen = function () {
               self.touchStartPosition = position;
           });
           button.addEventListener(this.eventTouchend, function (event) {
-              console.log("ok, touchend", position);
               if (event.touches.length >= 1 || event.changedTouches.length != 1) {
                   self.touchStartPosition = {x: -1, y: -1};
                   return;  // Ignore if the touch is still going on.
@@ -128,11 +126,9 @@ KeyboardInputManager.prototype.listen = function () {
           });
 
           button.addEventListener("mousedown", function (event) {
-              console.log("ok, mousedown", position);
               self.touchStartPosition = position;
           });
           button.addEventListener("mouseup", function (event) {
-              console.log("ok, mouseup", position);
               var source = self.touchStartPosition;
               self.touchStartPosition = {x: -1, y: -1};
               dispatch(source, position);

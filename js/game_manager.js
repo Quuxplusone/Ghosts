@@ -29,6 +29,7 @@ GameManager.prototype.isGameTerminated = function () {
 GameManager.prototype.serialize = function () {
   return {
     grid: this.grid.serialize(),
+    aiPlayer: this.aiPlayer.serialize(),
     lost: this.lost,
     won: this.won,
   };
@@ -40,10 +41,12 @@ GameManager.prototype.setup = function () {
     // Reload the game from a previous game if present
     if (previousState) {
         this.grid = Grid.fromPreviousState(previousState.grid);
+        this.aiPlayer = AIPlayer.fromPreviousState(previousState.aiPlayer);
         this.lost = previousState.lost;
         this.won = previousState.won;
     } else {
         this.grid = Grid.newGame();
+        this.aiPlayer = AIPlayer.newGame();
         this.lost = false;
         this.won = false;
     }
@@ -195,8 +198,6 @@ GameManager.prototype.click = function (position) {
 };
 
 GameManager.prototype.swipe = function (position_and_direction) {
-    console.log("ok, swipe", position_and_direction);
-
     if (this.isGameTerminated()) return; // Don't do anything if the game's over
 
     var source = position_and_direction.source;
@@ -300,6 +301,7 @@ GameManager.prototype.commitMoveForHuman = function (source, direction) {
 
     if (!this.isGameTerminated()) {
         var self = this;
+        self.aiPlayer.observeHumanMove(self, source, target);
         window.setTimeout(function () {
             var result = self.aiPlayer.chooseMove(self);
             self.commitMoveForAI(result.source, result.direction);
@@ -327,5 +329,3 @@ GameManager.prototype.commitMoveForAI = function (source, direction) {
     this.won = this.grid.aiJustLost();
     this.lost = this.grid.aiJustWon();
 };
-
-
