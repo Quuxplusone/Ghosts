@@ -111,12 +111,8 @@ KeyboardInputManager.prototype.listen = function () {
                   return;  // Ignore if the touch is still going on.
               }
               var changedTouch = event.changedTouches[0];
-              console.log("changedTouch.clientXY is", changedTouch.clientX, changedTouch.clientY);
-              console.log("changedTouch.element/target is", changedTouch.element, changedTouch.target);
               var element = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-              console.log("element is", element);
               var position = {x: element.x, y: element.y};
-              console.log("position is", position);
               var source = self.touchStartPosition;
               self.touchStartPosition = {x: -1, y: -1};
               dispatch(source, position);

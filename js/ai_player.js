@@ -33,8 +33,8 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
     this.estimatedBlueness[target.x][target.y] = this.estimatedBlueness[source.x][source.y];
     this.estimatedBlueness[source.x][source.y] = null;
 
-    var targetA = gameManager.grid.adjacentAIPieces(target);
-    var sourceA = gameManager.grid.adjacentAIPieces(source);
+    var targetA = gameManager.grid.adjacentPieces(target, 'ai');
+    var sourceA = gameManager.grid.adjacentPieces(source, 'ai');
     var movedForward = (target.y == source.y - 1);
     var movedSideways = (target.y == source.y);
     var reachedLastTwoRows = (target.y <= 1);
@@ -61,7 +61,7 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
                 continue;
             }
             if (this.estimatedBlueness[x][y] !== null) {
-                if (gameManager.grid.adjacentAIPieces({x: x, y: y}) >= 1) {
+                if (gameManager.grid.adjacentPieces({x: x, y: y}, 'ai') >= 1) {
                     this.estimatedBlueness[x][y] -= 1.2;
                 }
             }
@@ -69,7 +69,7 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
     }
 };
 
-AIPlayer.prototype.allValidMoves = function (gameManager) {
+AIPlayer.prototype.allValidMovesForAI = function (gameManager) {
     var moves = [];
     for (var x=0; x < 6; ++x) {
         for (var y=0; y < 6; ++y) {
@@ -81,8 +81,6 @@ AIPlayer.prototype.allValidMoves = function (gameManager) {
                         source: source,
                         direction: direction,
                         target: target,
-                        makesCapture: (gameManager.grid.at(target).owner === 'human'),
-                        advancesSouthward: (direction == 2),
                     });
                 }
             }
@@ -91,31 +89,124 @@ AIPlayer.prototype.allValidMoves = function (gameManager) {
     return moves;
 };
 
-AIPlayer.prototype.compareMoves = function (a, b) {
-    if (a.makesCapture != b.makesCapture) {
-        return (a.makesCapture ? -1 : +1);
+AIPlayer.prototype.distanceToAIGoal = function (position) {
+    if (position.x <= 2) {
+        return (5 - position.y) + position.x;
+    } else {
+        return (5 - position.y) + (5 - position.x);
     }
-    if (a.advancesSouthward != b.advancesSouthward) {
-        return (a.advancesSouthward ? -1 : +1);
-    }
-    return 0;
 };
 
-AIPlayer.prototype.mightPreventWin = function (a) {
-    if (!a.makesCapture) {
-        return false;
+AIPlayer.prototype.moveWins = function (m, grid) {
+    if (grid.at(m.source).color === 'blue') {
+        if (this.distanceToAIGoal(m.target) == 0) {
+            return 0;
+        }
+        if (this.distanceToAIGoal(m.target) == 1) {
+            if (grid.adjacentPieces(m.target, 'human') == 0) {
+                return 1;
+            }
+        }
     }
-    return (a.target.x == 0 && (a.target.y == 1 || a.target.y == 4)) ||
-           (a.target.x == 1 && (a.target.y == 0 || a.target.y == 5));
+    return null;
+};
+
+AIPlayer.prototype.movePlacesGoalkeeper = function (m) {
+    return (m.target.y == 1) && (m.target.x == 1 || m.target.x == 4);
+};
+
+AIPlayer.prototype.moveAbandonsGoalkeeping = function (m) {
+    return (m.source.y == 1) && (m.source.x == 1 || m.source.x == 4);
+};
+
+AIPlayer.prototype.moveProtectsMyBlue = function (m, grid) {
+    if (grid.at(m.source).color === 'blue') {
+        if (grid.adjacentPieces(m.source, 'human') >= 1 && grid.adjacentPieces(m.target, 'human') == 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
+AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid) {
+    var eb = this.estimatedBlueness[m.target.x][m.target.y];
+    if (eb !== null) {
+        var estimates = this.estimatedBlueness.flat().filter(e => (e !== null));
+        estimates.sort();
+        var bluesLeft = grid.humanPiecesRemaining('blue');
+        var redsLeft = grid.humanPiecesRemaining('red');
+        var threshold = [
+            [0, 0, 0, 0, 0],
+            [0, 1, 1, 2, 3],
+            [0, 1, 2, 3, 3],
+            [0, 2, 3, 4, 5],
+            [0, 3, 4, 6, 7],
+        ][bluesLeft][redsLeft];
+        if (eb >= estimates[8 - threshold]) {
+            return eb;
+        }
+    }
+    return null;
+};
+
+AIPlayer.prototype.moveAdvancesForward = function (m) {
+    var movesForward = (m.target.y == m.source.y + 1);
+    var movesSideways = (m.target.y == m.source.y);
+    if (movesForward) {
+        return 25 - m.target.y;
+    } else if (movesSideways) {
+        return 15 - m.target.y;
+    } else {
+        return 5 - m.target.y;
+    }
 };
 
 AIPlayer.prototype.chooseMove = function (gameManager) {
-    var moves = this.allValidMoves(gameManager);
+    var m = this.chooseMoveToObserve(gameManager);
+
+    // If this move captures a human piece, update its estimated blueness.
+    console.assert(this.estimatedBlueness[m.source.x][m.source.y] === null);
+    this.estimatedBlueness[m.target.x][m.target.y] = null;
+
+    return m;
+};
+
+AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
+    var self = this;
+    var moves = this.allValidMovesForAI(gameManager);
+    var grid = gameManager.grid;
+
     Util.shuffleArray(moves);
-    moves.sort(this.compareMoves);  // stable sort good moves toward the front
-    if (this.mightPreventWin(moves[0])) {
-        return moves[0];
+
+    // Return the move that's guaranteed to win the quickest.
+    var winningMoves = moves.filter(m => (self.moveWins(m, grid) !== null));
+    if (winningMoves.length >= 1) {
+        return Util.maxByMetric(winningMoves, m => -self.moveWins(m, grid));
     }
-    var i = Math.floor(Math.sqrt(Math.random() * moves.length * moves.length));
-    return moves[i];
+
+    // Protect our sole remaining blue piece.
+    if (grid.aiPiecesRemaining('blue') === 1) {
+        var protectingMoves = moves.filter(m => self.moveProtectsMyBlue(m, grid));
+        if (protectingMoves.length >= 1) {
+            return protectingMoves[0];
+        }
+    }
+
+    // Capture an estimated blue piece.
+    var capturingMoves = moves.filter(m => (self.moveCapturesEstimatedBluePiece(m, grid) !== null));
+    if (capturingMoves.length >= 1) {
+        return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid));
+    }
+
+    if (grid.capturedByHuman.length <= 4) {
+        var goalkeepingMoves = moves.filter(m => self.movePlacesGoalkeeper(m));
+        if (goalkeepingMoves >= 1) {
+            return goalkeepingMoves[0];
+        }
+    }
+
+    if (grid.capturedByHuman.length <= 4) {
+        moves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
+    }
+    return Util.maxByMetric(moves, m => self.moveAdvancesForward(m));
 };

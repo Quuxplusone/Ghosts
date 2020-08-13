@@ -14,8 +14,12 @@ I find the "PvP" rules easier to teach, slightly quicker to play,
 and certainly easier to make the UI for, so that's what I've
 implemented here.
 
-I'd like to give it a good AI, but I currently don't have any
-good ideas in that area.
+The AI player is currently based on the paper "Developing geister algorithms without machine learning"
+("機械学習を用いないガイスターの行動アルゴリズム開発") by Koki Suetsugu and Yusuke Orita.
+It is not very strong compared to a human player.
+
+Play versus the AI by [clicking here](https://quuxplusone.github.io/Ghosts).
+
 
 ## Reading list
 
@@ -40,5 +44,5 @@ good ideas in that area.
 - ["Amelioration of artificial intelligence using game techniques for an imperfect information board game geister"](https://www.researchgate.net/publication/289050582)
     (S. Balakrishnan, K.L. Shunmuganathan, Raja Sreenevasan; 2014)
 
-- ["Developping geister algorithms without machine learning"](https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_action_common_download&item_id=186127&item_no=1&attribute_id=1&file_no=1)
+- ["Developing geister algorithms without machine learning"](https://ipsj.ixsq.nii.ac.jp/ej/?action=repository_action_common_download&item_id=186127&item_no=1&attribute_id=1&file_no=1)
     (Koki Suetsugu, Yusuke Orita; 2018; full text in Japanese).

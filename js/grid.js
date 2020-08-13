@@ -75,13 +75,12 @@ Grid.prototype.at = function (position) {
     return this.cells[position.x][position.y];
 };
 
-Grid.prototype.adjacentAIPieces = function (position) {
+Grid.prototype.adjacentPieces = function (position, owner) {
     console.assert(Util.isWithinBounds(position));
     var count = 0;
-    count += (position.x > 0 && this.cells[position.x-1][position.y].owner == 'ai');
-    count += (position.x < 5 && this.cells[position.x+1][position.y].owner == 'ai');
-    count += (position.y > 0 && this.cells[position.x][position.y-1].owner == 'ai');
-    count += (position.y < 5 && this.cells[position.x][position.y+1].owner == 'ai');
+    for (var n of Util.neighborsOf(position)) {
+        count += (this.at(n).owner === owner);
+    }
     return count;
 };
 
