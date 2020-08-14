@@ -119,7 +119,13 @@ HTMLActuator.prototype.valueClass = function (tile) {
     if (tile.owner === null) {
         return "empty-cell";
     } else if (tile.owner == 'ai') {
-        return "enemy-ghost";
+        if (!window.cheat) {
+            return "enemy-ghost";
+        } else if (tile.color == 'red') {
+            return "cheat-enemy-red-ghost";
+        } else {
+            return "cheat-enemy-blue-ghost";
+        }
     } else if (tile.color == 'red') {
         return "red-ghost";
     } else {

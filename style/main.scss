@@ -458,6 +458,16 @@ hr {
     background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
     background-size: contain;
   }
+  &.cheat-enemy-red-ghost .tile-inner {
+    background-color: rgba(red, 0.2);
+    background-image: url(enemy-ghost.png);
+    background-size: contain;
+  }
+  &.cheat-enemy-blue-ghost .tile-inner {
+    background-color: rgba(blue, 0.2);
+    background-image: url(enemy-ghost.png);
+    background-size: contain;
+  }
 }
 
 .above-game {
