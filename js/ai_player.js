@@ -170,12 +170,16 @@ AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid, blueness)
     return null;
 };
 
-AIPlayer.prototype.moveAdvancesForward = function (m) {
-    var movesForward = (m.target.y == m.source.y + 1);
-    var movesSideways = (m.target.y == m.source.y);
-    if (movesForward) {
+AIPlayer.prototype.moveAdvancesForward = function (m, grid) {
+    var sourceDistance = this.distanceToAIGoal(m.source);
+    var targetDistance = this.distanceToAIGoal(m.target);
+    if (targetDistance === 1 && grid.at(m.source).color === 'red') {
+        // Try not to step in the way of a blue piece on its way to victory.
+        return 5 - m.target.y;
+    }
+    if (targetDistance < sourceDistance) {
         return 25 - m.target.y;
-    } else if (movesSideways) {
+    } else if (targetDistance == sourceDistance) {
         return 15 - m.target.y;
     } else {
         return 5 - m.target.y;
@@ -230,5 +234,5 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     if (grid.capturedByHuman.length <= 4) {
         moves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
     }
-    return Util.maxByMetric(moves, m => self.moveAdvancesForward(m));
+    return Util.maxByMetric(moves, m => self.moveAdvancesForward(m, grid));
 };
