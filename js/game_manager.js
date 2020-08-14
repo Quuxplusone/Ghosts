@@ -233,10 +233,10 @@ GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
     if (sourceTile.owner !== 'human' || targetTile.owner === 'human') {
         return false;
     }
-    if (sourceTile.color === 'red' && targetTile.isExitForHuman()) {
+    if (sourceTile.color === 'red' && Util.isHumanGoal(target)) {
         return false;
     }
-    if (targetTile.isExitForAI()) {
+    if (Util.isAIGoal(target)) {
         return false;
     }
     return true;
@@ -262,10 +262,10 @@ GameManager.prototype.isLegalMoveForAI = function (source, direction) {
     if (sourceTile.owner !== 'ai' || targetTile.owner === 'ai') {
         return false;
     }
-    if (sourceTile.color === 'red' && targetTile.isExitForAI()) {
+    if (sourceTile.color === 'red' && Util.isAIGoal(target)) {
         return false;
     }
-    if (targetTile.isExitForHuman()) {
+    if (Util.isHumanGoal(target)) {
         return false;
     }
     return true;
