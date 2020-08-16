@@ -57,6 +57,11 @@ Util.neighborsOf = function (position) {
     return result;
 };
 
+Util.notme = function (who) {
+    console.assert(who === 'ai' || who === 'human');
+    return (who === 'ai') ? 'human' : 'ai';
+};
+
 Util.isHumanStartPosition = function (position) {
     return 1 <= position.x && position.x <= 4 &&
            4 <= position.y && position.y <= 5;
@@ -67,10 +72,11 @@ Util.isAIStartPosition = function (position) {
            0 <= position.y && position.y <= 1;
 };
 
-Util.isHumanGoal = function (position) {
-    return (position.x == 0 && position.y == 0) || (position.x == 5 && position.y == 0);
-};
-
-Util.isAIGoal = function (position) {
-    return (position.x == 0 && position.y == 5) || (position.x == 5 && position.y == 5);
+Util.isGoalFor = function (who, position) {
+    console.assert(who === 'ai' || who === 'human');
+    if (who === 'ai') {
+        return (position.x === 0 || position.x === 5) && (position.y === 5);
+    } else {
+        return (position.x === 0 || position.x === 5) && (position.y === 0);
+    }
 };

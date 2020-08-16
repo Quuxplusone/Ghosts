@@ -69,14 +69,14 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
     }
 };
 
-AIPlayer.prototype.allValidMovesForAI = function (gameManager) {
+AIPlayer.prototype.legalMovesFor = function (who, gameManager) {
     var moves = [];
     for (var x=0; x < 6; ++x) {
         for (var y=0; y < 6; ++y) {
             for (var direction=0; direction < 4; ++direction) {
                 var source = {x: x, y: y};
                 var target = Util.addDirection(source, direction);
-                if (gameManager.isLegalMoveForAI(source, direction)) {
+                if (gameManager.isLegalMoveFor(who, source, direction)) {
                     moves.push({
                         source: source,
                         direction: direction,
@@ -198,7 +198,7 @@ AIPlayer.prototype.chooseMove = function (gameManager) {
 
 AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     var self = this;
-    var moves = this.allValidMovesForAI(gameManager);
+    var moves = this.legalMovesFor('ai', gameManager);
     var grid = gameManager.grid;
     var blueness = this.positionDependentBlueness();
 

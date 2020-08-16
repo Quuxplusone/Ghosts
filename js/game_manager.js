@@ -106,7 +106,7 @@ GameManager.prototype.arrow = function (direction) {
             y: Math.min(Math.max(0, this.highlightedTile.y + d.y), 5),
         };
     } else if (this.inputState == 1) {
-        if (this.isLegalMoveForHuman(this.highlightedTile, direction)) {
+        if (this.isLegalMoveFor('human', this.highlightedTile, direction)) {
             this.selectedDirection = direction;
             this.inputState = 2;
         } else {
@@ -171,7 +171,7 @@ GameManager.prototype.click = function (position) {
         } else {
             this.selectedDirection = null;
         }
-        if (this.isLegalMoveForHuman(this.highlightedTile, this.selectedDirection)) {
+        if (this.isLegalMoveFor('human', this.highlightedTile, this.selectedDirection)) {
             this.inputState = 2;
         } else if (this.grid.at(position).owner === 'human') {
             this.highlightedTile = position;
@@ -204,7 +204,7 @@ GameManager.prototype.swipe = function (position_and_direction) {
     var direction = position_and_direction.direction;
     console.assert(Util.isWithinBounds(source));
 
-    if (this.isLegalMoveForHuman(source, direction)) {
+    if (this.isLegalMoveFor('human', source, direction)) {
         this.commitMoveForHuman(source, direction);
     } else {
         this.highlightedTile = source;
@@ -213,8 +213,10 @@ GameManager.prototype.swipe = function (position_and_direction) {
     this.actuate();
 };
 
-GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
-    if (this.grid.isAITurn) {
+GameManager.prototype.isLegalMoveFor = function (who, source, direction) {
+    console.assert(who === 'ai' || who === 'human');
+
+    if (this.grid.isAITurn != (who === 'ai')) {
         return false;
     }
 
@@ -230,42 +232,13 @@ GameManager.prototype.isLegalMoveForHuman = function (source, direction) {
     }
     var sourceTile = this.grid.at(source);
     var targetTile = this.grid.at(target);
-    if (sourceTile.owner !== 'human' || targetTile.owner === 'human') {
+    if (sourceTile.owner !== who || targetTile.owner === who) {
         return false;
     }
-    if (sourceTile.color === 'red' && Util.isHumanGoal(target)) {
+    if (sourceTile.color === 'red' && Util.isGoalFor(who, target)) {
         return false;
     }
-    if (Util.isAIGoal(target)) {
-        return false;
-    }
-    return true;
-};
-
-GameManager.prototype.isLegalMoveForAI = function (source, direction) {
-    if (!this.grid.isAITurn) {
-        return false;
-    }
-
-    if (source === null || direction === null) {
-        return false;
-    }
-    if (!Util.isWithinBounds(source)) {
-        return false;
-    }
-    var target = Util.addDirection(source, direction);
-    if (!Util.isWithinBounds(target)) {
-        return false;
-    }
-    var sourceTile = this.grid.at(source);
-    var targetTile = this.grid.at(target);
-    if (sourceTile.owner !== 'ai' || targetTile.owner === 'ai') {
-        return false;
-    }
-    if (sourceTile.color === 'red' && Util.isAIGoal(target)) {
-        return false;
-    }
-    if (Util.isHumanGoal(target)) {
+    if (Util.isGoalFor(Util.notme(who), target)) {
         return false;
     }
     return true;
