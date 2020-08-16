@@ -54,6 +54,11 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
         this.estimatedBlueness[target.x][target.y] += 10.0;
     }
 
+    // If this piece declined to move into the goal, it must be red.
+    if (Util.distanceToGoalFor('human', source) === 1) {
+        this.estimatedBlueness[target.x][target.y] = -1000.0;
+    }
+
     // Now, for each threatened piece that DIDN'T move, increase its redness.
     for (var x=0; x < 6; ++x) {
         for (var y=0; y < 6; ++y) {
@@ -63,6 +68,9 @@ AIPlayer.prototype.observeHumanMove = function (gameManager, source, target) {
             if (this.estimatedBlueness[x][y] !== null) {
                 if (gameManager.grid.adjacentPieces({x: x, y: y}, 'ai') >= 1) {
                     this.estimatedBlueness[x][y] -= 1.2;
+                }
+                if (Util.distanceToGoalFor('human', {x: x, y: y}) === 1) {
+                    this.estimatedBlueness[x][y] = -1000.0;
                 }
             }
         }
@@ -110,20 +118,12 @@ AIPlayer.prototype.positionDependentBlueness = function () {
     return result;
 };
 
-AIPlayer.prototype.distanceToAIGoal = function (position) {
-    if (position.x <= 2) {
-        return (5 - position.y) + position.x;
-    } else {
-        return (5 - position.y) + (5 - position.x);
-    }
-};
-
 AIPlayer.prototype.moveWins = function (m, grid) {
     if (grid.at(m.source).color === 'blue') {
-        if (this.distanceToAIGoal(m.target) == 0) {
+        if (Util.distanceToGoalFor('ai', m.target) == 0) {
             return 0;
         }
-        if (this.distanceToAIGoal(m.target) == 1) {
+        if (Util.distanceToGoalFor('ai', m.target) == 1) {
             if (grid.adjacentPieces(m.target, 'human') == 0) {
                 return 1;
             }
@@ -171,8 +171,8 @@ AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid, blueness)
 };
 
 AIPlayer.prototype.moveAdvancesForward = function (m, grid) {
-    var sourceDistance = this.distanceToAIGoal(m.source);
-    var targetDistance = this.distanceToAIGoal(m.target);
+    var sourceDistance = Util.distanceToGoalFor('ai', m.source);
+    var targetDistance = Util.distanceToGoalFor('ai', m.target);
     if (targetDistance === 1 && grid.at(m.source).color === 'red') {
         // Try not to step in the way of a blue piece on its way to victory.
         return 5 - m.target.y;
@@ -224,6 +224,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
         return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid, blueness));
     }
 
+    // Reposition the goalkeepers, at least if the game is still in the "first half."
     if (grid.capturedByHuman.length <= 4) {
         var goalkeepingMoves = moves.filter(m => self.movePlacesGoalkeeper(m));
         if (goalkeepingMoves >= 1) {
@@ -231,6 +232,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
         }
     }
 
+    // Move a trailing piece forward toward the goal.
     if (grid.capturedByHuman.length <= 4) {
         moves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
     }

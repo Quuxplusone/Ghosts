@@ -80,3 +80,10 @@ Util.isGoalFor = function (who, position) {
         return (position.x === 0 || position.x === 5) && (position.y === 0);
     }
 };
+
+Util.distanceToGoalFor = function (who, position) {
+    console.assert(who === 'ai' || who === 'human');
+    let horizontal = (position.x <= 2) ? position.x : (5 - position.x);
+    let vertical = (who === 'human') ? position.y : (5 - position.y);
+    return horizontal + vertical;
+};
