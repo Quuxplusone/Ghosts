@@ -244,27 +244,10 @@ GameManager.prototype.isLegalMoveFor = function (who, source, direction) {
     return true;
 };
 
-// Move tiles on the grid in the specified direction
 GameManager.prototype.commitMoveForHuman = function (source, direction) {
-    // 0: up, 1: right, 2: down, 3: left
-
     var target = Util.addDirection(source, direction);
-    console.assert(Util.isWithinBounds(source));
-    console.assert(Util.isWithinBounds(target));
-    var sourceTile = this.grid.at(source);
-    var targetTile = this.grid.at(target);
-    console.assert(sourceTile.owner === 'human');
-    console.assert(targetTile.owner !== 'human');
-    if (targetTile.owner === 'ai') {
-        this.grid.capturedByHuman.push(targetTile.color);
-    }
-    targetTile.color = sourceTile.color;
-    targetTile.owner = sourceTile.owner;
-    targetTile.previousPosition = sourceTile.position;
-    sourceTile.owner = null;
-    sourceTile.color = null;
-    this.grid.isAITurn = true;
-
+    this.grid.commitMove(source, target);
+    this.grid.at(target).previousPosition = {x: source.x, y: source.y};
     this.won = this.grid.humanJustWon();
     this.lost = this.grid.humanJustLost();
 
@@ -285,20 +268,8 @@ GameManager.prototype.commitMoveForHuman = function (source, direction) {
 
 GameManager.prototype.commitMoveForAI = function (source, direction) {
     var target = Util.addDirection(source, direction);
-    var sourceTile = this.grid.at(source);
-    var targetTile = this.grid.at(target);
-    console.assert(sourceTile.owner === 'ai');
-    console.assert(targetTile.owner !== 'ai');
-    if (targetTile.owner === 'human') {
-        this.grid.capturedByAI.push(targetTile.color);
-    }
-    targetTile.color = sourceTile.color;
-    targetTile.owner = sourceTile.owner;
-    targetTile.previousPosition = sourceTile.position;
-    sourceTile.owner = null;
-    sourceTile.color = null;
-    this.grid.isAITurn = false;
-
+    this.grid.commitMove(source, target);
+    this.grid.at(target).previousPosition = {x: source.x, y: source.y};
     this.won = this.grid.aiJustLost();
     this.lost = this.grid.aiJustWon();
 };

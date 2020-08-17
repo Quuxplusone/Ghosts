@@ -569,9 +569,9 @@ hr {
 .tile {
   position: absolute;
   pointer-events: none;
-  -webkit-transition: 100ms ease-in-out;
-  -moz-transition: 100ms ease-in-out;
-  transition: 100ms ease-in-out;
+  -webkit-transition: 200ms;
+  -moz-transition: 200ms;
+  transition: 200ms;
   -webkit-transition-property: -webkit-transform;
   -moz-transition-property: -moz-transform;
   transition-property: transform;

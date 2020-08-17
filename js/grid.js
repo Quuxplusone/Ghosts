@@ -70,6 +70,15 @@ Grid.prototype.serialize = function () {
     };
 };
 
+Grid.prototype.clone = function () {
+    var self = new Grid();
+    self.capturedByHuman = this.capturedByHuman.slice(0);
+    self.capturedByAI = this.capturedByAI.slice(0);
+    self.isAITurn = this.isAITurn;
+    self.cells = self.cellsFromState(this.cells);
+    return self;
+};
+
 Grid.prototype.at = function (position) {
     console.assert(Util.isWithinBounds(position));
     return this.cells[position.x][position.y];
@@ -97,6 +106,23 @@ Grid.prototype.highlightTile = function (highlightType, position, direction) {
         selectedTile.highlightType = highlightType;
         selectedTile.selectedDirection = direction;
     }
+};
+
+Grid.prototype.commitMove = function (source, target) {
+    var sourceTile = this.at(source);
+    var targetTile = this.at(target);
+    console.assert(sourceTile.owner === (this.isAITurn ? 'ai' : 'human'));
+    console.assert(targetTile.owner !== sourceTile.owner);
+    if (targetTile.owner === 'human') {
+        this.capturedByAI.push(targetTile.color);
+    } else if (targetTile.owner === 'ai') {
+        this.capturedByHuman.push(targetTile.color);
+    }
+    targetTile.color = sourceTile.color;
+    targetTile.owner = sourceTile.owner;
+    sourceTile.owner = null;
+    sourceTile.color = null;
+    this.isAITurn = !this.isAITurn;
 };
 
 Grid.prototype.humanPiecesRemaining = function (color) {
