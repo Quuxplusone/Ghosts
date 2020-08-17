@@ -233,7 +233,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     }
 
     // Move a trailing piece forward toward the goal.
-    if (grid.capturedByHuman.length <= 4) {
+    if (grid.capturedByHuman.length <= 3) {
         moves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
     }
     return Util.maxByMetric(moves, m => self.moveAdvancesForward(m, grid));
