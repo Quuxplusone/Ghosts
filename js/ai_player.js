@@ -168,14 +168,14 @@ AIPlayer.winningPatterns = {
 
 AIPlayer.newGame = function () {
     var self = new AIPlayer();
-    let n = null;
+    let f = function () { return Math.random()*0.001; };
     self.estimatedBlueness = [
-        [n,n,n,n,n,n],
-        [n,n,n,n,0,0],
-        [n,n,n,n,0,0],
-        [n,n,n,n,0,0],
-        [n,n,n,n,0,0],
-        [n,n,n,n,n,n],
+        [null, null, null, null, null, null],
+        [null, null, null, null, f(),  f() ],
+        [null, null, null, null, f(),  f() ],
+        [null, null, null, null, f(),  f() ],
+        [null, null, null, null, f(),  f() ],
+        [null, null, null, null, null, null],
     ];
     return self;
 };
@@ -281,6 +281,30 @@ AIPlayer.prototype.positionDependentBlueness = function () {
         }
     }
     return result;
+};
+
+AIPlayer.prototype.updateBlueIndex = function (grid) {
+    var blueness = this.positionDependentBlueness();
+    var redsLeft = grid.humanPiecesRemaining('red');
+    this.blueIndex = [
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+        [0,0,0,0,0,0],
+    ];
+    for (var x=0; x < 6; ++x) {
+        for (var y=0; y < 6; ++y) {
+            var eb = blueness[x][y];
+            if (eb === null) {
+                this.blueIndex[x][y] = null;
+            } else {
+                let estimatesLessThanEB = blueness.flat().filter(e => (e !== null) && (e < eb)).length;
+                this.blueIndex[x][y] = estimatesLessThanEB - redsLeft;
+            }
+        }
+    }
 };
 
 AIPlayer.prototype.flipPattern = function (p) {
@@ -408,22 +432,22 @@ AIPlayer.prototype.moveProtectsMyBlue = function (m, grid) {
     return false;
 };
 
-AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid, blueness) {
-    var eb = blueness[m.target.x][m.target.y];
-    if (eb !== null) {
-        var estimates = blueness.flat().filter(e => (e !== null));
-        estimates.sort();
+AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid) {
+    var i = this.blueIndex[m.target.x][m.target.y];
+    if (i !== null) {
         var bluesLeft = grid.humanPiecesRemaining('blue');
         var redsLeft = grid.humanPiecesRemaining('red');
+        // Notice that if the human has only one red left, we'll be conservative and raise our threshold;
+        // if the human has many red left, we'll be reckless and lower it.
         var threshold = [
             [0, 0, 0, 0, 0],
-            [0, 1, 1, 2, 3],
-            [0, 1, 2, 3, 3],
-            [0, 2, 3, 4, 5],
-            [0, 3, 4, 6, 7],
+            [0, 0, 0, -1, -2],
+            [0, 1, 0, -1, -1],
+            [0, 1, 0, -1, -2],
+            [0, 1, 0, -2, -3],
         ][bluesLeft][redsLeft];
-        if (eb >= estimates[8 - threshold]) {
-            return eb;
+        if (i >= threshold) {
+            return i;
         }
     }
     return null;
@@ -458,9 +482,10 @@ AIPlayer.prototype.chooseMove = function (gameManager) {
 AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     var self = this;
     var grid = gameManager.grid;
-    var moves = this.legalMoves(grid);
-    var blueness = this.positionDependentBlueness();
 
+    this.updateBlueIndex(grid);
+
+    var moves = this.legalMoves(grid);
     Util.shuffleArray(moves);
 
     for (let m of moves) {
@@ -495,9 +520,9 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     }
 
     // Capture an estimated blue piece.
-    var capturingMoves = moves.filter(m => (self.moveCapturesEstimatedBluePiece(m, grid, blueness) !== null));
+    var capturingMoves = moves.filter(m => (self.moveCapturesEstimatedBluePiece(m, grid) !== null));
     if (capturingMoves.length >= 1) {
-        return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid, blueness));
+        return Util.maxByMetric(capturingMoves, m => self.moveCapturesEstimatedBluePiece(m, grid));
     }
 
     // Reposition the goalkeepers, at least if the game is still in the "first half."
