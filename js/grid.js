@@ -42,12 +42,7 @@ Grid.prototype.cellsFromState = function (state) {
     for (var x = 0; x < this.size; x++) {
         var row = cells[x] = [];
         for (var y = 0; y < this.size; y++) {
-            if (state) {
-                var tile = state[x][y];
-                row.push(new Tile(tile.position, tile.color, tile.owner));
-            } else {
-                row.push(null);
-            }
+            row.push(state ? Tile.fromPreviousState(state[x][y]) : null);
         }
     }
     return cells;

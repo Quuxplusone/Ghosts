@@ -80,7 +80,7 @@ HTMLActuator.prototype.addTile = function (tile) {
 
     inner.classList.add("tile-inner");
 
-    if (tile.previousPosition !== null) {
+    if (tile.previousPosition) {
         // Make sure that the tile gets rendered in the previous position first
         tile.previousPosition = null;
         this.applyClasses(wrapper, classes);
