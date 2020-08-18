@@ -103,6 +103,32 @@ Grid.prototype.highlightTile = function (highlightType, position, direction) {
     }
 };
 
+Grid.prototype.isLegalMove = function (source, direction) {
+    var who = (this.isAITurn ? 'ai' : 'human');
+    if (source === null || direction === null) {
+        return false;
+    }
+    if (!Util.isWithinBounds(source)) {
+        return false;
+    }
+    var target = Util.addDirection(source, direction);
+    if (!Util.isWithinBounds(target)) {
+        return false;
+    }
+    var sourceTile = this.at(source);
+    var targetTile = this.at(target);
+    if (sourceTile.owner !== who || targetTile.owner === who) {
+        return false;
+    }
+    if (sourceTile.color === 'red' && Util.isGoalFor(who, target)) {
+        return false;
+    }
+    if (Util.isGoalFor(Util.notme(who), target)) {
+        return false;
+    }
+    return true;
+};
+
 Grid.prototype.commitMove = function (source, target) {
     var sourceTile = this.at(source);
     var targetTile = this.at(target);
