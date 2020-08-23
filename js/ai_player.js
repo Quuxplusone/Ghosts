@@ -347,6 +347,7 @@ AIPlayer.prototype.humanPatternMatches = function (p, grid) {
         for (var y=0; y < 6; ++y) {
             let pat = p[5 - y][x];
             let tile = grid.at({x: x, y: y});
+            let isDefinitelyRed = (this.estimatedBlueness[x][y] < -900.0);
             if (pat == '?') {
                 // ok so far
             } else if (pat === 'h') {
@@ -361,7 +362,7 @@ AIPlayer.prototype.humanPatternMatches = function (p, grid) {
                 if (tile.owner !== 'human') return false;
             } else if (pat === 'B') {
                 if (tile.owner !== 'human') return false;
-                // if (blueness[x][y] !== 'blue') return false;
+                if (isDefinitelyRed) return false;
             } else if (pat === '.') {
                 if (tile.owner !== null) return false;
             } else {
