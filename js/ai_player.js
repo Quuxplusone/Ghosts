@@ -493,6 +493,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     for (let m of moves) {
         m.probablyLoses = self.moveProbablyLoses(m, grid);
         m.wins = self.moveWins(m, grid);
+        m.captures = grid.at(m.target).owner === 'human';
         if ((m.wins || 1000) <= (m.probablyLoses || 1000)) {
             // A move that wins a horse race doesn't actually lose.
             m.probablyLoses = null;
@@ -502,8 +503,9 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     // Look ahead to avoid losing by a silly move in the endgame.
     var nonlosingMoves = moves.filter(m => (m.probablyLoses === null));
     if (nonlosingMoves.length === 0) {
-        // If all moves seem to lose, pick the move that might win the quickest and/or loses the slowest.
-        return Util.maxByMetric(moves, m => (m.wins ? 1000 - m.wins : m.probablyLoses));
+        // If all moves seem to lose, pick the move that might win the quickest and/or loses the slowest,
+        // If winning, avoid unnecessary captures; if losing, prefer moves that capture.
+        return Util.maxByMetric(moves, m => (m.wins ? 2*(1000 - m.wins) + !m.captures : 2*m.probablyLoses + m.captures));
     }
     moves = nonlosingMoves;
 
