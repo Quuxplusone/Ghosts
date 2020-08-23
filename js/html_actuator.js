@@ -66,7 +66,8 @@ HTMLActuator.prototype.addTile = function (tile) {
     var position  = { x: tile.x, y: tile.y };
     var positionClass = this.positionClass(tile.previousPosition ? tile.previousPosition : position);
 
-    var appearanceClasses = [ this.valueClass(tile) ];
+    var appearanceClasses = this.cheatClasses(tile);
+    appearanceClasses.push(this.valueClass(tile));
 
     if (tile.highlightType !== null) {
         appearanceClasses.push("tile-highlighted-" + tile.highlightType);
@@ -119,18 +120,26 @@ HTMLActuator.prototype.valueClass = function (tile) {
     if (tile.owner === null) {
         return "empty-cell";
     } else if (tile.owner == 'ai') {
-        if (!window.cheat) {
-            return "enemy-ghost";
-        } else if (tile.color == 'red') {
-            return "cheat-enemy-red-ghost";
-        } else {
-            return "cheat-enemy-blue-ghost";
-        }
+        return "enemy-ghost";
     } else if (tile.color == 'red') {
         return "red-ghost";
     } else {
         return "blue-ghost";
     }
+};
+
+HTMLActuator.prototype.cheatClasses = function (tile) {
+    if (!window.cheat) {
+        return [];
+    } else if (tile.owner === 'ai') {
+        return (tile.color === 'red') ? ['cheat-red'] : ['cheat-blue'];
+    } else if (tile.owner === 'human' && window.cheat_aiplayer && window.cheat_aiplayer.blueIndex) {
+        var i = window.cheat_aiplayer.blueIndex[tile.x][tile.y];
+        if (i !== null) {
+            return (i < 0) ? ['cheat-red'] : ['cheat-blue'];
+        }
+    }
+    return [];
 };
 
 HTMLActuator.prototype.clearMessage = function () {

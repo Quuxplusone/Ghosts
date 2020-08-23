@@ -483,6 +483,8 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     var self = this;
     var grid = gameManager.grid;
 
+    window.cheat_aiplayer = this;
+
     this.updateBlueIndex(grid);
 
     var moves = this.legalMoves(grid);

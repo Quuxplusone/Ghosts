@@ -661,15 +661,11 @@ hr {
   background-image: radial-gradient(circle at center, red 0%, red 10%, transparent 20%), url(friendly-ghost.png);
   background-size: contain;
 }
-.tile.cheat-enemy-red-ghost .tile-inner {
+.tile.cheat-red .tile-inner {
   background-color: rgba(255, 0, 0, 0.2);
-  background-image: url(enemy-ghost.png);
-  background-size: contain;
 }
-.tile.cheat-enemy-blue-ghost .tile-inner {
+.tile.cheat-blue .tile-inner {
   background-color: rgba(0, 0, 255, 0.2);
-  background-image: url(enemy-ghost.png);
-  background-size: contain;
 }
 
 .above-game:after {
