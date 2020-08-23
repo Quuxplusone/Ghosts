@@ -318,6 +318,60 @@ AIPlayer.prototype.patternMatches = function (p, grid) {
     return true;
 };
 
+AIPlayer.prototype.humanPatternMatches = function (p, grid) {
+    for (var x=0; x < 6; ++x) {
+        for (var y=0; y < 6; ++y) {
+            let pat = p[5 - y][x];
+            let tile = grid.at({x: x, y: y});
+            if (pat == '?') {
+                // ok so far
+            } else if (pat === 'h') {
+                if (tile.owner !== 'ai') return false;
+            } else if (pat === 'A') {
+                if (tile.owner !== 'human') return false;
+            } else if (pat === 'F') {  // "friendly"
+                if (tile.owner === 'ai') return false;
+            } else if (pat === '*') {  // "target"
+                if (tile.owner === 'human') return false;
+            } else if (pat === 'R') {
+                if (tile.owner !== 'human') return false;
+            } else if (pat === 'B') {
+                if (tile.owner !== 'human') return false;
+                // if (blueness[x][y] !== 'blue') return false;
+            } else if (pat === '.') {
+                if (tile.owner !== null) return false;
+            } else {
+                console.assert(false);
+            }
+        }
+    }
+    return true;
+};
+
+AIPlayer.prototype.moveProbablyLoses = function (m, grid) {
+    var hgrid = grid.clone();
+    hgrid.commitMove(m.source, m.target);
+    // Now hgrid is what the human player will see.
+    var best = 1000;
+    var patterns = AIPlayer.winningPatterns;
+    for (var hm of this.legalMoves(hgrid)) {
+        let key = `${hm.source.x} ${5 - hm.source.y} -> ${hm.target.x} ${5 - hm.target.y}`;
+        for (var p of patterns[key] || []) {
+            if (this.humanPatternMatches(p[0], hgrid)) {
+                best = Math.min(best, p[1]);
+            }
+        }
+
+        key = `${5 - hm.source.x} ${5 - hm.source.y} -> ${5 - hm.target.x} ${5 - hm.target.y}`;
+        for (var p of patterns[key] || []) {
+            if (this.humanPatternMatches(this.flipPattern(p[0]), hgrid)) {
+                best = Math.min(best, p[1]);
+            }
+        }
+    }
+    return (best === 1000) ? null : best;
+};
+
 AIPlayer.prototype.moveWins = function (m, grid) {
     var patterns = AIPlayer.winningPatterns;
 
@@ -409,10 +463,27 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
 
     Util.shuffleArray(moves);
 
+    for (let m of moves) {
+        m.probablyLoses = self.moveProbablyLoses(m, grid);
+        m.wins = self.moveWins(m, grid);
+        if ((m.wins || 1000) <= (m.probablyLoses || 1000)) {
+            // A move that wins a horse race doesn't actually lose.
+            m.probablyLoses = null;
+        }
+    }
+
+    // Look ahead to avoid losing by a silly move in the endgame.
+    var nonlosingMoves = moves.filter(m => (m.probablyLoses === null));
+    if (nonlosingMoves.length === 0) {
+        // If all moves seem to lose, pick the move that might win the quickest and/or loses the slowest.
+        return Util.maxByMetric(moves, m => (m.wins ? 1000 - m.wins : m.probablyLoses));
+    }
+    moves = nonlosingMoves;
+
     // Return the move that's guaranteed to win the quickest.
-    var winningMoves = moves.filter(m => (self.moveWins(m, grid) !== null));
+    var winningMoves = moves.filter(m => (m.wins !== null));
     if (winningMoves.length >= 1) {
-        return Util.maxByMetric(winningMoves, m => -self.moveWins(m, grid));
+        return Util.maxByMetric(winningMoves, m => -m.wins);
     }
 
     // Protect our sole remaining blue piece.
@@ -439,7 +510,10 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
 
     // Move a trailing piece forward toward the goal.
     if (grid.capturedByHuman.length <= 3) {
-        moves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
+        var nonAbandoningMoves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
+        if (nonAbandoningMoves.length >= 1) {
+            moves = nonAbandoningMoves;
+        }
     }
     return Util.maxByMetric(moves, m => self.moveAdvancesForward(m, grid));
 };
