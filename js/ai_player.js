@@ -420,8 +420,12 @@ AIPlayer.prototype.movePlacesGoalkeeper = function (m) {
     return (m.target.y == 1) && (m.target.x == 1 || m.target.x == 4);
 };
 
-AIPlayer.prototype.moveAbandonsGoalkeeping = function (m) {
-    return (m.source.y == 1) && (m.source.x == 1 || m.source.x == 4);
+AIPlayer.prototype.moveMaintainsGoalkeeping = function (m, grid) {
+    if (m.source.y === 1 && (m.source.x === 1 || m.source.x === 4)) {
+        // It's okay to step out of position if there's someone else behind you to step into it.
+        return (grid.at({x: m.source.x, y: 0}).owner === 'ai');
+    }
+    return true;
 };
 
 AIPlayer.prototype.moveProtectsMyBlue = function (m, grid) {
@@ -470,11 +474,11 @@ AIPlayer.prototype.moveAdvancesForward = function (m, grid) {
         return 5 - m.target.y;
     }
     if (targetDistance < sourceDistance) {
-        return 25 - m.target.y;
+        return 300 + targetDistance;
     } else if (targetDistance == sourceDistance) {
-        return 15 - m.target.y;
+        return 200 + targetDistance;
     } else {
-        return 5 - m.target.y;
+        return 100 + targetDistance;
     }
 };
 
@@ -548,9 +552,9 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
 
     // Move a trailing piece forward toward the goal.
     if (grid.capturedByHuman.length <= 3) {
-        var nonAbandoningMoves = moves.filter(m => !self.moveAbandonsGoalkeeping(m));
-        if (nonAbandoningMoves.length >= 1) {
-            moves = nonAbandoningMoves;
+        var maintainingMoves = moves.filter(m => self.moveMaintainsGoalkeeping(m, grid));
+        if (maintainingMoves.length >= 1) {
+            moves = maintainingMoves;
         }
     }
     return Util.maxByMetric(moves, m => self.moveAdvancesForward(m, grid));
