@@ -425,12 +425,20 @@ AIPlayer.prototype.moveAbandonsGoalkeeping = function (m) {
 };
 
 AIPlayer.prototype.moveProtectsMyBlue = function (m, grid) {
-    if (grid.at(m.source).color === 'blue') {
-        if (grid.adjacentPieces(m.source, 'human') >= 1 && grid.adjacentPieces(m.target, 'human') == 0) {
-            return true;
+    var hgrid = grid.clone();
+    hgrid.commitMove(m.source, m.target);
+    // Now hgrid is what the human player will see.
+    for (var x=0; x < 6; ++x) {
+        for (var y=0; y < 6; ++y) {
+            let position = {x: x, y: y};
+            let tile = hgrid.at(position);
+            if (tile.owner === 'ai' && tile.color === 'blue') {
+                return (hgrid.adjacentPieces(position, 'human') === 0);
+            }
         }
     }
-    return false;
+    console.assert(false);
+    return true;
 };
 
 AIPlayer.prototype.moveCapturesEstimatedBluePiece = function (m, grid) {
@@ -520,7 +528,7 @@ AIPlayer.prototype.chooseMoveToObserve = function (gameManager) {
     if (grid.aiPiecesRemaining('blue') === 1) {
         var protectingMoves = moves.filter(m => self.moveProtectsMyBlue(m, grid));
         if (protectingMoves.length >= 1) {
-            return protectingMoves[0];
+            moves = protectingMoves;
         }
     }
 
