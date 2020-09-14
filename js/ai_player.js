@@ -11,10 +11,16 @@ AIPlayer.winningPatterns = {
           '.F????'], 3],
         [['??????',
           '??????',
-          'R?????',
+          'A?????',
           'hF????',
           '.BF???',
           '.F????'], 3],
+        [['??????',
+          '??????',
+          'B?????',
+          '*F????',
+          '.1????',
+          '.?????'], 3],
     ],
     '0 3 -> 0 4': [
         [['??????',
@@ -37,8 +43,14 @@ AIPlayer.winningPatterns = {
           '??????',
           'F?????',
           'BF????',
-          'RhF???',
+          'A*F???',
           '.F????'], 3],
+        [['??????',
+          '??????',
+          'F?????',
+          'BF????',
+          '1*????',
+          '.?????'], 3],
     ],
     '1 2 -> 0 2': [
         [['??????',
@@ -47,6 +59,12 @@ AIPlayer.winningPatterns = {
           '.FF???',
           '.FFF??',
           '.FF???'], 4],
+        [['??????',
+          'F?????',
+          '*B????',
+          '.FF???',
+          '.1????',
+          '.?????'], 4],
     ],
     '1 2 -> 1 3': [
         [['??????',
@@ -81,6 +99,12 @@ AIPlayer.winningPatterns = {
           '*B????',
           '.FF???',
           '.F????'], 3],
+        [['??????',
+          '??????',
+          'F?????',
+          '*B????',
+          '.1????',
+          '.?????'], 3],
     ],
     '1 3 -> 1 4': [
         [['??????',
@@ -139,6 +163,12 @@ AIPlayer.winningPatterns = {
           'B*A???',
           '.hFF??',
           '.FF???'], 4],
+        [['??????',
+          'F?????',
+          'FF????',
+          'B*1???',
+          '.h????',
+          '.?????'], 4],
     ],
     '2 3 -> 2 4': [
         [['??????',
@@ -147,6 +177,12 @@ AIPlayer.winningPatterns = {
           'BFA???',
           '.h*F??',
           '.FF???'], 4],
+        [['??????',
+          'F?????',
+          'FF????',
+          'BF1???',
+          '.h*???',
+          '.?????'], 4],
     ],
     '2 4 -> 1 4': [
         [['??????',
@@ -326,7 +362,8 @@ AIPlayer.prototype.patternMatches = function (p, grid) {
                 if (tile.owner === 'human') return false;
             } else if (pat === '*') {  // "target"
                 if (tile.owner === 'ai') return false;
-            } else if (pat === 'R') {
+            } else if (pat === '1') {
+                if (grid.aiPiecesRemaining('red') !== 1) return false;
                 if (tile.owner !== 'ai') return false;
                 if (tile.color !== 'red') return false;
             } else if (pat === 'B') {
@@ -358,7 +395,8 @@ AIPlayer.prototype.humanPatternMatches = function (p, grid) {
                 if (tile.owner === 'ai') return false;
             } else if (pat === '*') {  // "target"
                 if (tile.owner === 'human') return false;
-            } else if (pat === 'R') {
+            } else if (pat === '1') {
+                if (grid.humanPiecesRemaining('red') !== 1) return false;
                 if (tile.owner !== 'human') return false;
             } else if (pat === 'B') {
                 if (tile.owner !== 'human') return false;
