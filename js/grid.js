@@ -1,6 +1,4 @@
-function Grid() {
-    this.size = 6;
-}
+function Grid() {}
 
 Grid.newGame = function () {
     var self = new Grid();
@@ -39,9 +37,9 @@ Grid.fromPreviousState = function (previousState) {
 
 Grid.prototype.cellsFromState = function (state) {
     var cells = [];
-    for (var x = 0; x < this.size; x++) {
+    for (var x = 0; x < 6; ++x) {
         var row = cells[x] = [];
-        for (var y = 0; y < this.size; y++) {
+        for (var y = 0; y < 6; ++y) {
             row.push(state ? Tile.fromPreviousState(state[x][y]) : null);
         }
     }
@@ -50,14 +48,13 @@ Grid.prototype.cellsFromState = function (state) {
 
 Grid.prototype.serialize = function () {
     var cellState = [];
-    for (var x = 0; x < this.size; x++) {
+    for (var x = 0; x < 6; ++x) {
         var row = cellState[x] = [];
-        for (var y = 0; y < this.size; y++) {
+        for (var y = 0; y < 6; ++y) {
             row.push(this.cells[x][y].serialize());
         }
     }
     return {
-        size: this.size,
         cells: cellState,
         capturedByHuman: this.capturedByHuman,
         capturedByAI: this.capturedByAI,
@@ -90,8 +87,8 @@ Grid.prototype.adjacentPieces = function (position, owner) {
 
 Grid.prototype.highlightTile = function (highlightType, position, direction) {
     console.assert(Util.isWithinBounds(position));
-    for (var x = 0; x < this.size; ++x) {
-        for (var y = 0; y < this.size; ++y) {
+    for (var x = 0; x < 6; ++x) {
+        for (var y = 0; y < 6; ++y) {
             this.cells[x][y].highlightType = null;
             this.cells[x][y].selectedDirection = null;
         }

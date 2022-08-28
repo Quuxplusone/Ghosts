@@ -1,5 +1,4 @@
 function GameManager(InputManager, Actuator, StorageManager, AIPlayer) {
-    this.size           = 6; // Size of the grid
     this.inputManager   = new InputManager;
     this.storageManager = new StorageManager("ghosts");
     this.actuator       = new Actuator;
